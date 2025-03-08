@@ -424,7 +424,7 @@ app.get("/eliminarExperimento/:id", (req, res) => {
 
 
 app.get("/", (req, res) => {
-    res.redirect("/obtenerAngeles");  // Aquí rediriges a la ruta que ya está definida
+    res.redirect("/");  // Aquí rediriges a la ruta que ya está definida
 });
 
 // Servidor corriendo
