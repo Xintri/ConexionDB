@@ -7,8 +7,6 @@ const { Pool } = require('pg');
 require('dotenv').config();
 console.log(process.env.DB_USER);
 
-
-
 const pool = new Pool({
     user: process.env.DB_USER || 'root', // El usuario: 'root'
     host: process.env.DB_HOST,           // El host
@@ -17,6 +15,7 @@ const pool = new Pool({
     port: process.env.DB_PORT || 5432,   // El puerto
     ssl: { rejectUnauthorized: false }   // Necesario para Render
 });
+
 
 // Middleware
 app.use(bodyParser.json());
