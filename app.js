@@ -1,5 +1,4 @@
 const express = require("express");
-const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const path = require("path");
 
@@ -15,7 +14,6 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
 });
-
 
 
 
