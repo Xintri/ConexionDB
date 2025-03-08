@@ -5,16 +5,21 @@ const path = require("path");
 
 const app = express();
 
-// Conexión segura con MySQL usando Pool
-const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "n0m3l0",
-    database: "6iv8",
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+const { Pool } = require('pg'); // Cambiar a pg en lugar de mysql2
+require('dotenv').config();
+
+// Conexión con PostgreSQL
+const pool = new Pool({
+    user: process.env.DB_USER,  // Usa las variables de entorno
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
 });
+
+
+// Ahora puedes usar 'pool' para ejecutar consultas SQL como lo haces con MySQL
+
 
 // Middleware
 app.use(bodyParser.json());
@@ -46,7 +51,7 @@ app.post("/agregarAngel", (req, res) => {
     }
 
     pool.query(
-        "INSERT INTO angeles (nombre, codigo, jerarquia, captura, estado) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO angeles (nombre, codigo, jerarquia, captura, estado) VALUES ($1, $2, $3, $4, $5)",
         [sanitize(nombre), sanitize(codigo), jerarquia, sanitize(captura), estado],
         (err) => {
             if (err) {
@@ -132,7 +137,7 @@ app.get("/obtenerAngeles", (req, res) => {
 app.get("/editarAngel/:id", (req, res) => {
     const angelId = req.params.id;
 
-    pool.query("SELECT * FROM angeles WHERE id = ?", [angelId], (err, resultados) => {
+    pool.query("SELECT * FROM angeles WHERE id = $1", [angelId], (err, resultados) => {
         if (err) {
             console.error("Error al obtener el ángel:", err);
             return res.status(500).send("Error en el servidor.");
@@ -198,7 +203,7 @@ app.post("/actualizarAngel/:id", (req, res) => {
     const { nombre, codigo, jerarquia, captura, estado } = req.body;
 
     pool.query(
-        "UPDATE angeles SET nombre = ?, codigo = ?, jerarquia = ?, captura = ?, estado = ? WHERE id = ?",
+        "UPDATE angeles SET nombre = $1, codigo = $2, jerarquia = $3, captura = $4, estado = $5 WHERE id = $6",
         [nombre, codigo, jerarquia, captura, estado, angelId],
         (err) => {
             if (err) {
@@ -215,7 +220,7 @@ app.post("/actualizarAngel/:id", (req, res) => {
 app.get("/eliminarAngel/:id", (req, res) => {
     const angelId = req.params.id;
 
-    pool.query("DELETE FROM angeles WHERE id = ?", [angelId], (err) => {
+    pool.query("DELETE FROM angeles WHERE id = $1", [angelId], (err) => {
         if (err) {
             console.error("Error al eliminar el ángel:", err);
             return res.status(500).send("Error al eliminar el ángel.");
@@ -227,7 +232,6 @@ app.get("/eliminarAngel/:id", (req, res) => {
 
 //----------------------------EXPERIMENTOS----------------------------
 
-//----------------------------EXPERIMENTOS----------------------------
 
 // Ruta para mostrar el formulario de registrar un experimento
 app.get("/registrarExperimento", (req, res) => {
@@ -275,7 +279,7 @@ app.post("/agregarExperimento", (req, res) => {
 
     // Insertar el nuevo experimento en la base de datos
     pool.query(
-        "INSERT INTO experimentos (tipo_experimento, descripcion, resultado) VALUES (?, ?, ?)",
+        "INSERT INTO experimentos (tipo_experimento, descripcion, resultado) VALUES ($1, $2, $3)",
         [tipo_experimento, sanitize(descripcion), sanitize(resultado)],
         (err) => {
             if (err) {
@@ -359,7 +363,7 @@ app.get("/obtenerExperimentos", (req, res) => {
 app.get("/editarExperimento/:id", (req, res) => {
     const experimentoId = req.params.id;
 
-    pool.query("SELECT * FROM experimentos WHERE id = ?", [experimentoId], (err, resultados) => {
+    pool.query("SELECT * FROM experimentos WHERE id = $1", [experimentoId], (err, resultados) => {
         if (err) {
             console.error("Error al obtener el experimento:", err);
             return res.status(500).send("Error al obtener el experimento.");
@@ -411,7 +415,7 @@ app.get("/eliminarExperimento/:id", (req, res) => {
     const experimentoId = req.params.id;
 
     // Realiza la eliminación del experimento
-    pool.query("DELETE FROM experimentos WHERE id = ?", [experimentoId], (err) => {
+    pool.query("DELETE FROM experimentos WHERE id = $1", [experimentoId], (err) => {
         if (err) {
             console.error("Error al eliminar el experimento:", err);
             return res.status(500).send("Error al eliminar el experimento.");
