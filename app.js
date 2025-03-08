@@ -431,7 +431,7 @@ app.get("/", (req, res) => {
 });
 
 // Servidor corriendo
-const PORT = process.env.PORT || 3000;  // Cambiar el puerto estático por uno dinámico
+const PORT = process.env.PORT || 4000;  // Cambiar el puerto estático por uno dinámico
 app.listen(PORT, () => {
     console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
 });
