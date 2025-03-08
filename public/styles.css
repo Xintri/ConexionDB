@@ -1,0 +1,164 @@
+/* Estilo general para el cuerpo */
+body {
+    background-color: #0a0a0a;
+    color: #b3b3b3;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+}
+
+/* Animación glitch */
+.glitch {
+    animation: glitch 1.5s infinite;
+}
+
+@keyframes glitch {
+    0% { text-shadow: 2px 2px red, -2px -2px blue; }
+    50% { text-shadow: -2px -2px red, 2px 2px blue; }
+    100% { text-shadow: 2px 2px red, -2px -2px blue; }
+}
+
+/* Contenedor para los formularios */
+.container {
+    max-width: 100%;
+    background: rgba(20, 20, 20, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+/* Títulos */
+h2 {
+    font-size: 1.8rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    padding: 10px 0;
+    border-bottom: 2px solid rgba(255, 0, 0, 0.5);
+}
+
+/* Estilos para los botones */
+.btn-glitch {
+    background: linear-gradient(90deg, #ff0000, #990000);
+    border: none;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-glitch:hover {
+    background: linear-gradient(90deg, #990000, #ff0000);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    transform: scale(1.05);
+}
+
+/* Campos de entrada */
+input, select, textarea {
+    background-color: black;
+    color: white;
+    border: 1px solid #990000;
+    padding: 8px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+input::placeholder, textarea::placeholder {
+    color: rgba(255, 0, 0, 0.5);
+}
+
+textarea {
+    resize: none;
+    height: 100px;
+}
+
+/* Estilo para los mensajes de alerta */
+.alert-hack {
+    color: red;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Contenedor de las tablas */
+.table-container {
+    overflow-x: auto;
+}
+
+/* Estilos para la tabla */
+.table {
+    width: 100%; /* Hace que la tabla ocupe el 100% del ancho de la página */
+    background: rgba(20, 20, 20, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+    table-layout: fixed; /* Esto hace que las columnas se ajusten de acuerdo al contenido */
+    word-wrap: break-word; /* Hace que el texto largo se ajuste y no se desborde */
+}
+
+/* Estilos para las cabeceras */
+.table th {
+    background-color: #990000;
+    color: white;
+}
+
+/* Estilos para las celdas */
+.table td {
+    background-color: rgba(20, 20, 20, 0.9);
+    color: #ddd;
+}
+
+/* Alineación de las celdas */
+.table th, .table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px; /* Se ajustó el padding para mejorar la apariencia */
+}
+
+/* Ajustes especiales para la columna de 'Captura' */
+.table th:nth-child(5), .table td:nth-child(5) {
+    width: 35%; /* Ajusta el ancho de la columna de 'Captura' */
+    word-wrap: break-word; /* Hace que el texto largo se ajuste */
+    white-space: normal; /* Asegura que el texto pueda dividirse */
+}
+
+/* Hover en filas de tabla */
+.table tr:hover {
+    background-color: rgba(255, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+/* Estilos para los botones dentro de la tabla */
+.table td a.btn {
+    font-size: 1rem; /* Ajusta el tamaño del texto en los botones */
+    padding: 8px 12px; /* Aumenta el tamaño de los botones */
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* Estilos para los botones de 'Editar' y 'Eliminar' */
+.btn-warning {
+    background-color: #f39c12; /* Naranja para 'Editar' */
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+}
+
+.btn-danger {
+    background-color: #e74c3c; /* Rojo para 'Eliminar' */
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
