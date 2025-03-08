@@ -5,17 +5,17 @@ const path = require("path");
 
 const app = express();
 
-const { Pool } = require('pg'); // Cambiar a pg en lugar de mysql2
+const { Pool } = require('pg');  // Asegúrate de que estés usando 'pg'
 require('dotenv').config();
 
-// Conexión con PostgreSQL
 const pool = new Pool({
-    user: process.env.DB_USER,  // Usa las variables de entorno
+    user: process.env.DB_USER,
     host: process.env.DB_HOST,
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
 });
+
 
 
 // Ahora puedes usar 'pool' para ejecutar consultas SQL como lo haces con MySQL
