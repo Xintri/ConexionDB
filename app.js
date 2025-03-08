@@ -5,18 +5,16 @@ const path = require("path");
 
 const app = express();
 
-require("dotenv").config();
-
+// Conexión segura con MySQL usando Pool
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
+    host: "localhost",
+    user: "root",
+    password: "n0m3l0",
+    database: "6iv8",
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
-
 
 // Middleware
 app.use(bodyParser.json());
@@ -424,9 +422,7 @@ app.get("/eliminarExperimento/:id", (req, res) => {
 });
 
 
-app.get("/", (req, res) => {
-    res.send("🚀 Backend funcionando en Railway!");
-});
+
 
 
 // Servidor corriendo
