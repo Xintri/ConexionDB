@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const path = require("path");
 
 const app = express();
+const { Pool } = require('pg');
+
 
 const pool = new Pool({
     user: process.env.DB_USER || 'postgres', // Asegúrate de usar 'postgres'
