@@ -424,7 +424,9 @@ app.get("/eliminarExperimento/:id", (req, res) => {
 });
 
 
-
+app.get("/", (req, res) => {
+    res.send("🚀 Backend funcionando en Railway!");
+});
 
 
 // Servidor corriendo
