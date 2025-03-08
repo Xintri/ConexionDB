@@ -5,16 +5,18 @@ const path = require("path");
 
 const app = express();
 
-// Conexión segura con MySQL usando Pool
+require("dotenv").config();
+
 const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "n0m3l0",
-    database: "6iv8",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
+
 
 // Middleware
 app.use(bodyParser.json());
