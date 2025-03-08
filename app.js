@@ -4,16 +4,15 @@ const path = require("path");
 
 const app = express();
 
-const { Pool } = require('pg');  // Asegúrate de que se esté usando 'pg' en vez de 'mysql2'
-require('dotenv').config();
-
 const pool = new Pool({
-    user: process.env.DB_USER,
+    user: process.env.DB_USER || 'postgres', // Asegúrate de usar 'postgres'
     host: process.env.DB_HOST,
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
+    port: process.env.DB_PORT || 5432,
+    ssl: { rejectUnauthorized: false } // Render necesita esto
 });
+
 
 
 
