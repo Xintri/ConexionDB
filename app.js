@@ -10,14 +10,13 @@ console.log(process.env.DB_USER);
 
 
 const pool = new Pool({
-    user: process.env.DB_USER || 'postgres', // El usuario
-    host: process.env.DB_HOST,               // El host (donde está alojada la base de datos)
-    database: process.env.DB_DATABASE,       // El nombre de la base de datos
-    password: process.env.DB_PASSWORD,       // La contraseña
-    port: process.env.DB_PORT || 5432,       // El puerto
-    ssl: { rejectUnauthorized: false }       // Necesario para Render
+    user: process.env.DB_USER || 'root', // El usuario: 'root'
+    host: process.env.DB_HOST,           // El host
+    database: process.env.DB_DATABASE,   // El nombre de la base de datos
+    password: process.env.DB_PASSWORD,   // La contraseña
+    port: process.env.DB_PORT || 5432,   // El puerto
+    ssl: { rejectUnauthorized: false }   // Necesario para Render
 });
-
 
 // Middleware
 app.use(bodyParser.json());
