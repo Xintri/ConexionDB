@@ -5,7 +5,7 @@ const path = require("path");
 
 const app = express();
 
-const { Pool } = require('pg');  // Asegúrate de que estés usando 'pg'
+const { Pool } = require('pg');  // Asegúrate de que se esté usando 'pg' en vez de 'mysql2'
 require('dotenv').config();
 
 const pool = new Pool({
@@ -15,6 +15,7 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT,
 });
+
 
 
 
