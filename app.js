@@ -424,8 +424,9 @@ app.get("/eliminarExperimento/:id", (req, res) => {
 
 
 app.get("/", (req, res) => {
-    res.redirect("/");  // Aquí rediriges a la ruta que ya está definida
+    res.redirect("/obtenerAngeles");  // Aquí rediriges a la ruta que ya está definida
 });
+
 
 // Servidor corriendo
 const PORT = process.env.PORT || 3000;  // Cambiar el puerto estático por uno dinámico
