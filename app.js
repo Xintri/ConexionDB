@@ -4,6 +4,9 @@ const path = require("path");
 
 const app = express();
 const { Pool } = require('pg');
+require('dotenv').config();
+console.log(process.env.DB_USER);
+
 
 
 const pool = new Pool({
@@ -12,14 +15,9 @@ const pool = new Pool({
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
     port: process.env.DB_PORT || 5432,
-    ssl: { rejectUnauthorized: false } // Render necesita esto
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
 });
-
-
-
-
-// Ahora puedes usar 'pool' para ejecutar consultas SQL como lo haces con MySQL
-
 
 // Middleware
 app.use(bodyParser.json());
