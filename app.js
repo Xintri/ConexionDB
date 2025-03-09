@@ -29,8 +29,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 app.get("/", (req, res) => {
-    res.sendFile(__dirname+'/public/index.html');
+    console.log(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 
