@@ -41,8 +41,9 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.get("/", (req, res) => {
-    res.send("<h1>🚀 Servidor en Render funcionando correctamente!</h1>");
+    res.redirect("/obtenerAngeles");
 });
+
 
 // Servidor corriendo
 const PORT = process.env.PORT || 3000;
