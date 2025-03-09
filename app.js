@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-    res.sendFile('/opt/render/project/src/public/index.html');
+    res.sendFile('./public/index.html');
 });
 
 
