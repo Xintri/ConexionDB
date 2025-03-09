@@ -14,7 +14,17 @@ console.log("DB_DATABASE:", process.env.DB_DATABASE);
 console.log("DB_PORT:", process.env.DB_PORT);
 console.log("SSL:", process.env.DB_SSL);
 
+// ⚠️ Verifica que DB_HOST sea el correcto, debería ser el **External Database URL** de Render
+const pool = new Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT || 5432,
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false
+});
 
+// ✅ Verificar conexión a la base de datos antes de iniciar el servidor
 pool.connect()
     .then(() => console.log("✅ Conectado a la BD en Render"))
     .catch(err => {
@@ -39,6 +49,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
 });
+
 
 
 // Sanitizar inputs
