@@ -338,7 +338,7 @@ app.get("/obtenerExperimentos", (req, res) => {
                 </thead>
                 <tbody>`;
 
-        resultados.forEach(experimento => {
+            resultados.rows.forEach(experimento => {
             tablaExperimentos += `
                 <tr>
                     <td>${experimento.id}</td>
@@ -392,11 +392,11 @@ app.get("/editarExperimento/:id", (req, res) => {
             return res.status(500).send("Error al obtener el experimento.");
         }
 
-        if (resultados.length === 0) {
+        if (resultados.rows.length === 0) {
             return res.status(404).send("Experimento no encontrado.");
         }
 
-        const experimento = resultados[0];
+        const experimento = resultados.rows[0];
         res.send(`
             <!DOCTYPE html>
             <html lang="es">
