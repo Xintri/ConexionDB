@@ -91,11 +91,16 @@ app.post("/agregarAngel", (req, res) => {
 app.get("/obtenerAngeles", (req, res) => {
     pool.query("SELECT * FROM angeles", (err, resultados) => {
         if (err) {
-            console.error("Error al obtener ángeles:", err);
+            console.error("❌ Error al obtener ángeles:", err);
             return res.status(500).send("Error en el servidor.");
         }
 
-        // Generar la tabla HTML con los ángeles
+        if (!resultados || !resultados.rows) {
+            console.error("⚠️ No hay datos en la consulta.");
+            return res.status(500).send("Error: No hay datos en la consulta.");
+        }
+
+        // 🔥 USAR resultados.rows en lugar de resultados
         let tablaAngeles = `
             <table class="table table-dark table-bordered table-hover text-center">
                 <thead>
@@ -112,7 +117,7 @@ app.get("/obtenerAngeles", (req, res) => {
                 </thead>
                 <tbody>`;
 
-        resultados.forEach(angel => {
+        resultados.rows.forEach(angel => {  // 🔥 Cambiar resultados por resultados.rows
             tablaAngeles += `
                 <tr>
                     <td>${angel.id}</td>
@@ -156,6 +161,7 @@ app.get("/obtenerAngeles", (req, res) => {
         `);
     });
 });
+
 
 // Ruta para editar un ángel
 app.get("/editarAngel/:id", (req, res) => {
