@@ -1,0 +1,14 @@
+# Node.js dependencies
+node_modules/
+
+# Archivos de entorno que no deberían subirse al repositorio
+.env
+
+# Archivos de logs
+*.log
+
+# Archivos de configuración de editor
+.vscode/
+
+# Archivos temporales
+*.tmp
