@@ -1,10 +1,11 @@
-const express = require("express");
+const express = require('express');
 const bodyParser = require("body-parser");
 const path = require('path');
 const { Pool } = require("pg");
 require("dotenv").config();
 
 const app = express();
+
 // ⚠️ Verifica que DB_HOST sea el correcto, debería ser el **External Database URL** de Render
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -39,8 +40,8 @@ app.get("/", (req, res) => {
 
 // Servidor corriendo
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
+app.listen(10000, () => {
+    console.log('🚀 Servidor escuchando en el puerto 10000');
 });
 
 
