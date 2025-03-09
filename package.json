@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build": "pwd && ls 'lna",
+    "build": "pwd && ls -lna",
     "dev": "npm install -g nodemon && nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
