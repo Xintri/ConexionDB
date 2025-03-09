@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const app = express();
 
-// Verificar que las variables de entorno están bien cargadas
+// Verificar variables de entorno
 console.log("🔍 Verificando variables de entorno:");
 console.log("DB_USER:", process.env.DB_USER);
 console.log("DB_HOST:", process.env.DB_HOST);
@@ -14,22 +14,12 @@ console.log("DB_DATABASE:", process.env.DB_DATABASE);
 console.log("DB_PORT:", process.env.DB_PORT);
 console.log("SSL:", process.env.DB_SSL);
 
-// Configurar conexión a PostgreSQL en Render
-const pool = new Pool({
-    user: process.env.DB_USER, // Usuario de la BD en Render
-    host: process.env.DB_HOST, // External Database URL de Render
-    database: process.env.DB_DATABASE, // Nombre de la BD en Render
-    password: process.env.DB_PASSWORD, // Contraseña de la BD en Render
-    port: process.env.DB_PORT || 5432, // Puerto, siempre 5432 en Render
-    ssl: { rejectUnauthorized: false } // Render requiere SSL
-});
 
-// Verificar conexión a la base de datos
 pool.connect()
     .then(() => console.log("✅ Conectado a la BD en Render"))
     .catch(err => {
         console.error("❌ Error al conectar a la BD:", err);
-        process.exit(1); // Detiene la aplicación si no se puede conectar
+        process.exit(1);
     });
 
 // Middleware
@@ -40,7 +30,6 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Ruta de prueba para verificar que el servidor está funcionando
 app.get("/", (req, res) => {
     res.send("<h1>🚀 Servidor en Render funcionando correctamente!</h1>");
 });
@@ -50,6 +39,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
 });
+
 
 // Sanitizar inputs
 function validarInput(input) {
