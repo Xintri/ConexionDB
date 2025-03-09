@@ -1,29 +1,55 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
+const { Pool } = require("pg");
+require("dotenv").config();
 
 const app = express();
-const { Pool } = require('pg');
-require('dotenv').config();
-console.log(process.env.DB_USER);
 
+// Verificar que las variables de entorno están bien cargadas
+console.log("🔍 Verificando variables de entorno:");
+console.log("DB_USER:", process.env.DB_USER);
+console.log("DB_HOST:", process.env.DB_HOST);
+console.log("DB_DATABASE:", process.env.DB_DATABASE);
+console.log("DB_PORT:", process.env.DB_PORT);
+console.log("SSL:", process.env.DB_SSL);
+
+// Configurar conexión a PostgreSQL en Render
 const pool = new Pool({
-    user: process.env.DB_USER || 'root', // El usuario: 'root'
-    host: process.env.DB_HOST,           // El host
-    database: process.env.DB_DATABASE,   // El nombre de la base de datos
-    password: process.env.DB_PASSWORD,   // La contraseña
-    port: process.env.DB_PORT || 5432,   // El puerto
-    ssl: { rejectUnauthorized: false }   // Necesario para Render
+    user: process.env.DB_USER, // Usuario de la BD en Render
+    host: process.env.DB_HOST, // External Database URL de Render
+    database: process.env.DB_DATABASE, // Nombre de la BD en Render
+    password: process.env.DB_PASSWORD, // Contraseña de la BD en Render
+    port: process.env.DB_PORT || 5432, // Puerto, siempre 5432 en Render
+    ssl: { rejectUnauthorized: false } // Render requiere SSL
 });
 
+// Verificar conexión a la base de datos
+pool.connect()
+    .then(() => console.log("✅ Conectado a la BD en Render"))
+    .catch(err => {
+        console.error("❌ Error al conectar a la BD:", err);
+        process.exit(1); // Detiene la aplicación si no se puede conectar
+    });
 
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Ruta de prueba para verificar que el servidor está funcionando
+app.get("/", (req, res) => {
+    res.send("<h1>🚀 Servidor en Render funcionando correctamente!</h1>");
+});
+
+// Servidor corriendo
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
+});
 
 // Sanitizar inputs
 function validarInput(input) {
@@ -426,9 +452,3 @@ app.get("/", (req, res) => {
     res.redirect("/obtenerAngeles");  // Aquí rediriges a la ruta que ya está definida
 });
 
-
-// Servidor corriendo
-const PORT = process.env.PORT || 3000;  // Cambiar el puerto estático por uno dinámico
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
-});
