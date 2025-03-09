@@ -166,12 +166,11 @@ app.get("/editarAngel/:id", (req, res) => {
             return res.status(500).send("Error en el servidor.");
         }
 
-        if (resultados.length === 0) {
+        if (resultados.rows.length === 0) {
             return res.status(404).send("Ángel no encontrado.");
         }
 
-        const angel = resultados[0];
-        // Enviar HTML con datos interpolados
+        const angel = resultados.rows[0];
         res.send(`
             <!DOCTYPE html>
             <html lang="es">
@@ -296,14 +295,14 @@ app.post("/agregarExperimento", (req, res) => {
     let { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
 
     // Validar que todos los campos estén completos
-    if (!validarInput(descripcion) || !validarInput(resultado)) {
+    if (!numero_experimento || !validarInput(descripcion) || !validarInput(resultado)) {
         return res.status(400).send({ error: "Error: Debes completar todos los campos." });
     }
 
-    // Insertar el nuevo experimento en la base de datos
+    // INSERT correcto incluyendo 'numero_experimento'
     pool.query(
-        "INSERT INTO experimentos (tipo_experimento, descripcion, resultado) VALUES ($1, $2, $3)",
-        [tipo_experimento, sanitize(descripcion), sanitize(resultado)],
+        "INSERT INTO experimentos (numero_experimento, tipo_experimento, descripcion, resultado) VALUES ($1, $2, $3, $4)",
+        [numero_experimento, tipo_experimento, sanitize(descripcion), sanitize(resultado)],
         (err) => {
             if (err) {
                 console.error("❌ Error al agregar el experimento:", err);
@@ -410,17 +409,18 @@ app.get("/editarExperimento/:id", (req, res) => {
             <body>
                 <div class="container text-center">
                     <h2 class="glitch">Editar Experimento</h2>
-                    <form action="/actualizarExperimento/${experimento.id}" method="post">
+                    <form action="/actualizarExperimento/<%= experimento.id %>" method="post">
+                        <input type="number" name="numero_experimento" value="<%= experimento.numero_experimento %>" class="form-control mb-2" required>
                         <select name="tipo_experimento" class="form-control mb-2" required>
-                            <option value="${experimento.tipo_experimento}" selected>${experimento.tipo_experimento}</option>
+                            <option value="<%= experimento.tipo_experimento %>" selected><%= experimento.tipo_experimento %></option>
                             <option value="Resistencia">Resistencia</option>
                             <option value="Manipulación Mental">Manipulación Mental</option>
                             <option value="Interacción Física">Interacción Física</option>
                             <option value="Lenguaje Angélico">Lenguaje Angélico</option>
                             <option value="Otros">Otros</option>
                         </select>
-                        <input type="text" name="descripcion" value="${experimento.descripcion}" class="form-control mb-2" required>
-                        <input type="text" name="resultado" value="${experimento.resultado}" class="form-control mb-2" required>
+                        <input type="text" name="descripcion" value="<%= experimento.descripcion %>" class="form-control mb-2" required>
+                        <input type="text" name="resultado" value="<%= experimento.resultado %>" class="form-control mb-2" required>
                         <input type="submit" value="Actualizar" class="btn btn-glitch w-100">
                     </form>
                     <a href="/obtenerExperimentos">
@@ -431,6 +431,23 @@ app.get("/editarExperimento/:id", (req, res) => {
             </html>
         `);
     });
+});
+
+app.post("/actualizarExperimento/:id", (req, res) => {
+    const experimentoId = req.params.id;
+    const { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
+
+    pool.query(
+        "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
+        [numero_experimento, tipo_experimento, sanitize(descripcion), sanitize(resultado), experimentoId],
+        (err) => {
+            if (err) {
+                console.error("Error al actualizar el experimento:", err);
+                return res.status(500).send("Error al actualizar el experimento.");
+            }
+            res.redirect("/obtenerExperimentos");
+        }
+    );
 });
 
 // Ruta para eliminar un experimento
