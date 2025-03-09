@@ -381,65 +381,89 @@ app.get("/obtenerExperimentos", (req, res) => {
     });
 });
 
-// Ruta para editar un experimento
+// Ruta para obtener todos los experimentos
 app.get("/editarExperimento/:id", (req, res) => {
     const experimentoId = req.params.id;
 
     pool.query("SELECT * FROM experimentos WHERE id = $1", [experimentoId], (err, resultados) => {
         if (err) {
-            console.error("Error al obtener el experimento:", err);
-            return res.status(500).send("Error al obtener el experimento.");
+        console.error("Error al obtener el experimento:", err);
+        return res.status(500).send("Error al obtener el experimento.");
         }
 
-        if (resultados.rows.length === 0) {
-            return res.status(404).send("Experimento no encontrado.");
+      // Asegúrate de usar resultados.rows
+        if (!resultados.rows || resultados.rows.length === 0) {
+        return res.status(404).send("Experimento no encontrado.");
         }
 
         const experimento = resultados.rows[0];
+
+      // Usar Template Strings para insertar valores
         res.send(`
-            <!DOCTYPE html>
-            <html lang="es">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Editar Experimento</title>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="/styles.css">
-            </head>
-            <body>
-                <div class="container text-center">
-                    <h2 class="glitch">Editar Experimento</h2>
-                    <form action="/actualizarExperimento/<%= experimento.id %>" method="post">
-                        <input type="number" name="numero_experimento" value="<%= experimento.numero_experimento %>" class="form-control mb-2" required>
-                        <select name="tipo_experimento" class="form-control mb-2" required>
-                            <option value="<%= experimento.tipo_experimento %>" selected><%= experimento.tipo_experimento %></option>
-                            <option value="Resistencia">Resistencia</option>
-                            <option value="Manipulación Mental">Manipulación Mental</option>
-                            <option value="Interacción Física">Interacción Física</option>
-                            <option value="Lenguaje Angélico">Lenguaje Angélico</option>
-                            <option value="Otros">Otros</option>
-                        </select>
-                        <input type="text" name="descripcion" value="<%= experimento.descripcion %>" class="form-control mb-2" required>
-                        <input type="text" name="resultado" value="<%= experimento.resultado %>" class="form-control mb-2" required>
-                        <input type="submit" value="Actualizar" class="btn btn-glitch w-100">
-                    </form>
-                    <a href="/obtenerExperimentos">
-                        <button class="btn btn-glitch w-100">Cancelar</button>
-                    </a>
-                </div>
-            </body>
-            </html>
-        `);
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Editar Experimento</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link rel="stylesheet" href="/styles.css">
+        </head>
+        <body>
+            <div class="container text-center">
+                <h2 class="glitch">Editar Experimento</h2>
+
+                <!-- Fíjate que concatenamos el ID con la ruta y usamos los valores del experimento -->
+                <form action="/actualizarExperimento/${experimento.id}" method="post">
+
+                    <!-- numero_experimento -->
+                    <input type="number" name="numero_experimento"
+                        value="${experimento.numero_experimento || ''}"
+                        class="form-control mb-2" required>
+
+                    <!-- tipo_experimento -->
+                    <select name="tipo_experimento" class="form-control mb-2" required>
+                        <option value="${experimento.tipo_experimento}" selected>
+                            ${experimento.tipo_experimento}
+                        </option>
+                        <option value="Resistencia">Resistencia</option>
+                        <option value="Manipulación Mental">Manipulación Mental</option>
+                        <option value="Interacción Física">Interacción Física</option>
+                        <option value="Lenguaje Angélico">Lenguaje Angélico</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+
+                    <!-- descripcion -->
+                    <input type="text" name="descripcion"
+                        value="${experimento.descripcion || ''}"
+                        class="form-control mb-2" required>
+
+                    <!-- resultado -->
+                    <input type="text" name="resultado"
+                        value="${experimento.resultado || ''}"
+                        class="form-control mb-2" required>
+
+                    <input type="submit" value="Actualizar" class="btn btn-glitch w-100">
+                </form>
+
+                <a href="/obtenerExperimentos">
+                    <button class="btn btn-glitch w-100">Cancelar</button>
+                </a>
+            </div>
+        </body>
+        </html>
+    `);
     });
 });
 
+// Ruta para actualizar todos los experimentos
 app.post("/actualizarExperimento/:id", (req, res) => {
     const experimentoId = req.params.id;
     const { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
 
     pool.query(
-        "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
-        [numero_experimento, tipo_experimento, sanitize(descripcion), sanitize(resultado), experimentoId],
+    "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
+    [numero_experimento, tipo_experimento, sanitize(descripcion), sanitize(resultado), experimentoId],
         (err) => {
             if (err) {
                 console.error("Error al actualizar el experimento:", err);
