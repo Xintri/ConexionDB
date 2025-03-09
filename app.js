@@ -5,15 +5,6 @@ const { Pool } = require("pg");
 require("dotenv").config();
 
 const app = express();
-
-// Verificar variables de entorno
-console.log("🔍 Verificando variables de entorno:");
-console.log("DB_USER:", process.env.DB_USER);
-console.log("DB_HOST:", process.env.DB_HOST);
-console.log("DB_DATABASE:", process.env.DB_DATABASE);
-console.log("DB_PORT:", process.env.DB_PORT);
-console.log("SSL:", process.env.DB_SSL);
-
 // ⚠️ Verifica que DB_HOST sea el correcto, debería ser el **External Database URL** de Render
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -43,6 +34,7 @@ app.set("views", path.join(__dirname, "views"));
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 
 
 // Servidor corriendo
