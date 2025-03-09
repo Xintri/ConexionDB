@@ -30,8 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-    console.log(path.join(__dirname, 'public', 'index.html'));
-    res.redirect("/");
+    res.redirect(path.join(__dirname, 'public', 'index'));
 });
 
 
