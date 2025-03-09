@@ -29,15 +29,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
 app.get("/", (req, res) => {
-    console.log("Entrando a app.get");
     console.log(path.join(__dirname, 'public', 'index.html'));
-    console.log(import.meta.filename);
-    console.log(import.meta.dirname);
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.redirect("/");
 });
 
 
