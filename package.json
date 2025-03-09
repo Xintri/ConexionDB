@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build": "mkdir -p public && cp ./index.html public/",
+    "build": "mkdir -p public && cp ./public/index.html public/",
     "dev": "npm install -g nodemon && nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
