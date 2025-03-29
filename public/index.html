@@ -9,7 +9,7 @@
 </head>
 <body class="min-vh-100">
     <div class="container text-center">
-        <!-- Título de la página -->
+        <!-- Título y advertencia -->
         <h1 class="glitch">[🔴 ACCESO RESTRINGIDO]</h1>
         <p class="alert-hack">Advertencia: Información clasificada. Proceda con precaución.</p>
         <hr>
@@ -19,7 +19,6 @@
         <form action="/agregarAngel" method="post" class="mb-4">
             <input type="text" name="nombre" placeholder="Nombre del Ángel" class="form-control mb-2" required>
             <input type="text" name="codigo" placeholder="Código (Ej: A-013)" class="form-control mb-2" required>
-
             <select name="jerarquia" class="form-control mb-2" required>
                 <option value="">-- Jerarquía --</option>
                 <option value="Serafín">Serafín</option>
@@ -32,9 +31,7 @@
                 <option value="Arcángel">Arcángel</option>
                 <option value="Ángel">Ángel</option>
             </select>
-
             <input type="text" name="captura" placeholder="Cómo fue atrapado..." class="form-control mb-2" required>
-
             <select name="estado" class="form-control mb-3" required>
                 <option value="">-- Estado --</option>
                 <option value="Contenido">Contenido</option>
@@ -42,7 +39,6 @@
                 <option value="En cuarentena">En cuarentena</option>
                 <option value="Desaparecido">Desaparecido</option>
             </select>
-
             <input type="submit" value="Registrar" class="btn btn-glitch w-100">
         </form>
 
@@ -52,7 +48,6 @@
         <h2>🧪 Registrar Experimento</h2>
         <form action="/agregarExperimento" method="post" class="mb-4">
             <input type="number" name="numero_experimento" placeholder="Número del Experimento" class="form-control mb-2" required>
-            
             <select name="tipo_experimento" class="form-control mb-2" required>
                 <option value="">-- Tipo de Experimento --</option>
                 <option value="Resistencia">Resistencia</option>
@@ -61,16 +56,14 @@
                 <option value="Lenguaje Angélico">Lenguaje Angélico</option>
                 <option value="Otros">Otros</option>
             </select>
-
             <input type="text" name="descripcion" placeholder="Descripción del experimento" class="form-control mb-2" required>
             <input type="text" name="resultado" placeholder="Resultado del experimento" class="form-control mb-2" required>
-
             <input type="submit" value="Registrar" class="btn btn-glitch w-100">
         </form>
 
         <hr>
 
-        <!-- Tabla de Ángeles Registrados -->
+        <!-- Enlaces a Listados -->
         <h2>📑 Lista de Ángeles Registrados</h2>
         <a href="/obtenerAngeles">
             <button class="btn btn-glitch w-100">Ver Ángeles Registrados</button>
@@ -78,7 +71,6 @@
 
         <hr>
 
-        <!-- Tabla de Experimentos Registrados -->
         <h2>📑 Lista de Todos los Experimentos</h2>
         <a href="/obtenerExperimentos">
             <button class="btn btn-glitch w-100">Ver Todos los Experimentos</button>
