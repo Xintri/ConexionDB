@@ -95,12 +95,12 @@ textarea {
 
 /* Estilos para la tabla */
 .table {
-    width: 100%; /* Hace que la tabla ocupe el 100% del ancho de la página */
+    width: 100%;
     background: rgba(20, 20, 20, 0.8);
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-    table-layout: fixed; /* Esto hace que las columnas se ajusten de acuerdo al contenido */
-    word-wrap: break-word; /* Hace que el texto largo se ajuste y no se desborde */
+    table-layout: fixed;
+    word-wrap: break-word;
 }
 
 /* Estilos para las cabeceras */
@@ -119,14 +119,14 @@ textarea {
 .table th, .table td {
     text-align: center;
     vertical-align: middle;
-    padding: 10px; /* Se ajustó el padding para mejorar la apariencia */
+    padding: 10px;
 }
 
 /* Ajustes especiales para la columna de 'Captura' */
 .table th:nth-child(5), .table td:nth-child(5) {
-    width: 35%; /* Ajusta el ancho de la columna de 'Captura' */
-    word-wrap: break-word; /* Hace que el texto largo se ajuste */
-    white-space: normal; /* Asegura que el texto pueda dividirse */
+    width: 35%;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 /* Hover en filas de tabla */
@@ -137,8 +137,8 @@ textarea {
 
 /* Estilos para los botones dentro de la tabla */
 .table td a.btn {
-    font-size: 1rem; /* Ajusta el tamaño del texto en los botones */
-    padding: 8px 12px; /* Aumenta el tamaño de los botones */
+    font-size: 1rem;
+    padding: 8px 12px;
     margin-top: 5px;
     margin-bottom: 5px;
     display: inline-block;
@@ -146,7 +146,7 @@ textarea {
 
 /* Estilos para los botones de 'Editar' y 'Eliminar' */
 .btn-warning {
-    background-color: #f39c12; /* Naranja para 'Editar' */
+    background-color: #f39c12;
     color: white;
 }
 
@@ -155,7 +155,7 @@ textarea {
 }
 
 .btn-danger {
-    background-color: #e74c3c; /* Rojo para 'Eliminar' */
+    background-color: #e74c3c;
     color: white;
 }
 

@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const path = require('path');
 const { Pool } = require("pg");
+const session = require('express-session');
 require("dotenv").config();
 
 const app = express();
@@ -29,44 +30,119 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+// Configuración de sesión
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'secret_key_default',
+    resave: false,
+    saveUninitialized: false,
+}));
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// Middleware para proteger rutas (requiere sesión)
+function requireLogin(req, res, next) {
+    if (req.session && req.session.user) {
+        next();
+    } else {
+        res.redirect("/login");
+    }
+}
+
+// ─── RUTAS DE INICIO DE SESIÓN ─────────────────────────────────────────────
+
+// Ruta para mostrar el formulario de login
+app.get("/login", (req, res) => {
+    res.send(`
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Iniciar Sesión</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="container">
+        <h2>Iniciar Sesión</h2>
+        <form action="/login" method="post">
+            <div class="mb-3">
+                <label for="username">Usuario:</label>
+                <input type="text" name="username" id="username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="password">Contraseña:</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+            <input type="submit" value="Iniciar Sesión" class="btn btn-primary">
+        </form>
+    </body>
+    </html>
+    `);
+});
+
+// Ruta para procesar el login
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).send("Falta usuario o contraseña");
+    }
+    pool.query("SELECT * FROM usuarios WHERE username = $1", [username], (err, result) => {
+        if (err) {
+            console.error("Error en login:", err);
+            return res.status(500).send("Error en el servidor");
+        }
+        if (result.rows.length === 0) {
+            return res.status(401).send("Usuario no encontrado");
+        }
+        const usuario = result.rows[0];
+        // Comparación simple de contraseñas (no recomendado para producción, utiliza hashing)
+        if (usuario.password !== password) {
+            return res.status(401).send("Contraseña incorrecta");
+        }
+        req.session.user = {
+            id: usuario.id,
+            username: usuario.username
+        };
+        res.redirect("/obtenerAngeles");
+    });
+});
+
+// Ruta para cerrar sesión
+app.get("/logout", (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error("Error al cerrar sesión", err);
+        }
+        res.redirect("/login");
+    });
+});
+
+// ─── RUTA RAÍZ ────────────────────────────────────────────────────────────────
+// Si el usuario está logueado, redirige a /obtenerAngeles; de lo contrario a /login.
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    if (req.session && req.session.user) {
+        res.redirect("/obtenerAngeles");
+    } else {
+        res.redirect("/login");
+    }
 });
 
-
-
-// Servidor corriendo
-const PORT = process.env.PORT || 3000;
-app.listen(10000, () => {
-    console.log('🚀 Servidor escuchando en el puerto 10000');
-});
-
-
-
-// Sanitizar inputs
+// ─── Funciones de Sanitización ───────────────────────────────────────────────
 function validarInput(input) {
     return !/[<>]/.test(input); // Evita los caracteres '<' y '>'
 }
 
-// Función de escape adicional para sanitizar
 function sanitize(value) {
     return value.replace(/[<>]/g, ""); // Reemplaza "<" y ">" por nada
 }
 
-//----------------------------ANGELES----------------------------
+// ─── RUTAS PARA ÁNGELES ─────────────────────────────────────────────────────
 
-// Ruta para agregar un nuevo ángel
-app.post("/agregarAngel", (req, res) => {
+app.post("/agregarAngel", requireLogin, (req, res) => {
     let { nombre, codigo, jerarquia, captura, estado } = req.body;
-
-    // Validar input
     if (!validarInput(nombre) || !validarInput(codigo) || !validarInput(captura) || !validarInput(estado)) {
         return res.status(400).send({ error: "Error: Entrada inválida. No se permiten los caracteres < y >." });
     }
-
     pool.query(
         "INSERT INTO angeles (nombre, codigo, jerarquia, captura, estado) VALUES ($1, $2, $3, $4, $5)",
         [sanitize(nombre), sanitize(codigo), jerarquia, sanitize(captura), estado],
@@ -80,20 +156,16 @@ app.post("/agregarAngel", (req, res) => {
     );
 });
 
-// Ruta para obtener todos los ángeles
-app.get("/obtenerAngeles", (req, res) => {
+app.get("/obtenerAngeles", requireLogin, (req, res) => {
     pool.query("SELECT * FROM angeles", (err, resultados) => {
         if (err) {
             console.error("❌ Error al obtener ángeles:", err);
             return res.status(500).send("Error en el servidor.");
         }
-
         if (!resultados || !resultados.rows) {
             console.error("⚠️ No hay datos en la consulta.");
             return res.status(500).send("Error: No hay datos en la consulta.");
         }
-
-        // 🔥 USAR resultados.rows en lugar de resultados
         let tablaAngeles = `
             <table class="table table-dark table-bordered table-hover text-center">
                 <thead>
@@ -109,8 +181,7 @@ app.get("/obtenerAngeles", (req, res) => {
                     </tr>
                 </thead>
                 <tbody>`;
-
-        resultados.rows.forEach(angel => {  // 🔥 Cambiar resultados por resultados.rows
+        resultados.rows.forEach(angel => {
             tablaAngeles += `
                 <tr>
                     <td>${angel.id}</td>
@@ -126,9 +197,7 @@ app.get("/obtenerAngeles", (req, res) => {
                     </td>
                 </tr>`;
         });
-
         tablaAngeles += `</tbody></table>`;
-
         res.send(`
             <!DOCTYPE html>
             <html lang="es">
@@ -144,9 +213,7 @@ app.get("/obtenerAngeles", (req, res) => {
                     <h2 class="glitch">Lista de Ángeles Registrados</h2>
                     ${tablaAngeles}
                     <div class="mt-4">
-                        <a href="/">
-                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
-                        </a>
+                        <a href="/logout"><button class="btn btn-glitch w-100">Cerrar Sesión</button></a>
                     </div>
                 </div>
             </body>
@@ -155,21 +222,16 @@ app.get("/obtenerAngeles", (req, res) => {
     });
 });
 
-
-// Ruta para editar un ángel
-app.get("/editarAngel/:id", (req, res) => {
+app.get("/editarAngel/:id", requireLogin, (req, res) => {
     const angelId = req.params.id;
-
     pool.query("SELECT * FROM angeles WHERE id = $1", [angelId], (err, resultados) => {
         if (err) {
             console.error("Error al obtener el ángel:", err);
             return res.status(500).send("Error en el servidor.");
         }
-
         if (resultados.rows.length === 0) {
             return res.status(404).send("Ángel no encontrado.");
         }
-
         const angel = resultados.rows[0];
         res.send(`
             <!DOCTYPE html>
@@ -219,16 +281,12 @@ app.get("/editarAngel/:id", (req, res) => {
     });
 });
 
-// Ruta para actualizar un ángel
-app.post("/actualizarAngel/:id", (req, res) => {
+app.post("/actualizarAngel/:id", requireLogin, (req, res) => {
     const angelId = req.params.id;
     const { nombre, codigo, jerarquia, captura, estado } = req.body;
-
-    // Validar input
     if (!validarInput(nombre) || !validarInput(codigo) || !validarInput(captura) || !validarInput(estado)) {
         return res.status(400).send({ error: "Error: Entrada inválida. No se permiten los caracteres < y >." });
     }
-
     pool.query(
         "UPDATE angeles SET nombre = $1, codigo = $2, jerarquia = $3, captura = $4, estado = $5 WHERE id = $6",
         [sanitize(nombre), sanitize(codigo), jerarquia, sanitize(captura), sanitize(estado), angelId],
@@ -237,31 +295,25 @@ app.post("/actualizarAngel/:id", (req, res) => {
                 console.error("Error al actualizar el ángel:", err);
                 return res.status(500).send("Error al actualizar el ángel.");
             }
-
             res.redirect("/obtenerAngeles");
         }
     );
 });
 
-// Ruta para eliminar un ángel
-app.get("/eliminarAngel/:id", (req, res) => {
+app.get("/eliminarAngel/:id", requireLogin, (req, res) => {
     const angelId = req.params.id;
-
     pool.query("DELETE FROM angeles WHERE id = $1", [angelId], (err) => {
         if (err) {
             console.error("Error al eliminar el ángel:", err);
             return res.status(500).send("Error al eliminar el ángel.");
         }
-
         res.redirect("/obtenerAngeles");
     });
 });
 
-//----------------------------EXPERIMENTOS----------------------------
+// ─── RUTAS PARA EXPERIMENTOS ───────────────────────────────────────────────
 
-
-// Ruta para mostrar el formulario de registrar un experimento
-app.get("/registrarExperimento", (req, res) => {
+app.get("/registrarExperimento", requireLogin, (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html lang="es">
@@ -295,16 +347,11 @@ app.get("/registrarExperimento", (req, res) => {
     `);
 });
 
-// Ruta para registrar un nuevo experimento
-app.post("/agregarExperimento", (req, res) => {
+app.post("/agregarExperimento", requireLogin, (req, res) => {
     let { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
-
-    // Validar que todos los campos estén completos
     if (!numero_experimento || !validarInput(descripcion) || !validarInput(resultado)) {
         return res.status(400).send({ error: "Error: Debes completar todos los campos." });
     }
-
-    // INSERT correcto incluyendo 'numero_experimento'
     pool.query(
         "INSERT INTO experimentos (numero_experimento, tipo_experimento, descripcion, resultado) VALUES ($1, $2, $3, $4)",
         [numero_experimento, tipo_experimento, sanitize(descripcion), sanitize(resultado)],
@@ -318,15 +365,12 @@ app.post("/agregarExperimento", (req, res) => {
     );
 });
 
-// Ruta para obtener todos los experimentos
-app.get("/obtenerExperimentos", (req, res) => {
+app.get("/obtenerExperimentos", requireLogin, (req, res) => {
     pool.query("SELECT * FROM experimentos", (err, resultados) => {
         if (err) {
             console.error("Error al obtener experimentos:", err);
             return res.status(500).send("Error en el servidor.");
         }
-
-        // Generar la tabla HTML con los experimentos
         let tablaExperimentos = `
             <table class="table table-dark table-bordered table-hover text-center">
                 <thead>
@@ -341,8 +385,7 @@ app.get("/obtenerExperimentos", (req, res) => {
                     </tr>
                 </thead>
                 <tbody>`;
-
-            resultados.rows.forEach(experimento => {
+        resultados.rows.forEach(experimento => {
             tablaExperimentos += `
                 <tr>
                     <td>${experimento.id}</td>
@@ -357,9 +400,7 @@ app.get("/obtenerExperimentos", (req, res) => {
                     </td>
                 </tr>`;
         });
-
         tablaExperimentos += `</tbody></table>`;
-
         res.send(`
             <!DOCTYPE html>
             <html lang="es">
@@ -375,9 +416,7 @@ app.get("/obtenerExperimentos", (req, res) => {
                     <h2 class="glitch">Lista de Experimentos Registrados</h2>
                     ${tablaExperimentos}
                     <div class="mt-4">
-                        <a href="/">
-                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
-                        </a>
+                        <a href="/logout"><button class="btn btn-glitch w-100">Cerrar Sesión</button></a>
                     </div>
                 </div>
             </body>
@@ -386,24 +425,17 @@ app.get("/obtenerExperimentos", (req, res) => {
     });
 });
 
-// Ruta para obtener todos los experimentos
-app.get("/editarExperimento/:id", (req, res) => {
+app.get("/editarExperimento/:id", requireLogin, (req, res) => {
     const experimentoId = req.params.id;
-
     pool.query("SELECT * FROM experimentos WHERE id = $1", [experimentoId], (err, resultados) => {
         if (err) {
-        console.error("Error al obtener el experimento:", err);
-        return res.status(500).send("Error al obtener el experimento.");
+            console.error("Error al obtener el experimento:", err);
+            return res.status(500).send("Error al obtener el experimento.");
         }
-
-      // Asegúrate de usar resultados.rows
         if (!resultados.rows || resultados.rows.length === 0) {
-        return res.status(404).send("Experimento no encontrado.");
+            return res.status(404).send("Experimento no encontrado.");
         }
-
         const experimento = resultados.rows[0];
-
-      // Usar Template Strings para insertar valores
         res.send(`
         <!DOCTYPE html>
         <html lang="es">
@@ -417,40 +449,20 @@ app.get("/editarExperimento/:id", (req, res) => {
         <body>
             <div class="container text-center">
                 <h2 class="glitch">Editar Experimento</h2>
-
-                <!-- Fíjate que concatenamos el ID con la ruta y usamos los valores del experimento -->
                 <form action="/actualizarExperimento/${experimento.id}" method="post">
-
-                    <!-- numero_experimento -->
-                    <input type="number" name="numero_experimento"
-                        value="${experimento.numero_experimento || ''}"
-                        class="form-control mb-2" required>
-
-                    <!-- tipo_experimento -->
+                    <input type="number" name="numero_experimento" value="${experimento.numero_experimento || ''}" class="form-control mb-2" required>
                     <select name="tipo_experimento" class="form-control mb-2" required>
-                        <option value="${experimento.tipo_experimento}" selected>
-                            ${experimento.tipo_experimento}
-                        </option>
+                        <option value="${experimento.tipo_experimento}" selected>${experimento.tipo_experimento}</option>
                         <option value="Resistencia">Resistencia</option>
                         <option value="Manipulación Mental">Manipulación Mental</option>
                         <option value="Interacción Física">Interacción Física</option>
                         <option value="Lenguaje Angélico">Lenguaje Angélico</option>
                         <option value="Otros">Otros</option>
                     </select>
-
-                    <!-- descripcion -->
-                    <input type="text" name="descripcion"
-                        value="${experimento.descripcion || ''}"
-                        class="form-control mb-2" required>
-
-                    <!-- resultado -->
-                    <input type="text" name="resultado"
-                        value="${experimento.resultado || ''}"
-                        class="form-control mb-2" required>
-
+                    <input type="text" name="descripcion" value="${experimento.descripcion || ''}" class="form-control mb-2" required>
+                    <input type="text" name="resultado" value="${experimento.resultado || ''}" class="form-control mb-2" required>
                     <input type="submit" value="Actualizar" class="btn btn-glitch w-100">
                 </form>
-
                 <a href="/obtenerExperimentos">
                     <button class="btn btn-glitch w-100">Cancelar</button>
                 </a>
@@ -461,14 +473,12 @@ app.get("/editarExperimento/:id", (req, res) => {
     });
 });
 
-// Ruta para actualizar todos los experimentos
-app.post("/actualizarExperimento/:id", (req, res) => {
+app.post("/actualizarExperimento/:id", requireLogin, (req, res) => {
     const experimentoId = req.params.id;
     const { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
-
     pool.query(
-    "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
-    [numero_experimento, tipo_experimento, sanitize(descripcion), sanitize(resultado), experimentoId],
+        "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
+        [numero_experimento, tipo_experimento, sanitize(descripcion), sanitize(resultado), experimentoId],
         (err) => {
             if (err) {
                 console.error("Error al actualizar el experimento:", err);
@@ -479,23 +489,19 @@ app.post("/actualizarExperimento/:id", (req, res) => {
     );
 });
 
-// Ruta para eliminar un experimento
-app.get("/eliminarExperimento/:id", (req, res) => {
+app.get("/eliminarExperimento/:id", requireLogin, (req, res) => {
     const experimentoId = req.params.id;
-
-    // Realiza la eliminación del experimento
     pool.query("DELETE FROM experimentos WHERE id = $1", [experimentoId], (err) => {
         if (err) {
             console.error("Error al eliminar el experimento:", err);
             return res.status(500).send("Error al eliminar el experimento.");
         }
-
-        res.redirect("/obtenerExperimentos");  // Redirige a la lista de experimentos después de la eliminación
+        res.redirect("/obtenerExperimentos");
     });
 });
 
-
-app.get("/", (req, res) => {
-    res.redirect("/obtenerAngeles");  // Aquí rediriges a la ruta que ya está definida
+// ─── Servidor corriendo ──────────────────────────────────────────────────────
+const PORT = process.env.PORT || 3000;
+app.listen(10000, () => {
+    console.log('🚀 Servidor escuchando en el puerto 10000');
 });
-
