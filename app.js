@@ -120,11 +120,7 @@ app.get("/logout", (req, res) => {
 // ─── RUTA RAÍZ ────────────────────────────────────────────────────────────────
 // Si el usuario está logueado, redirige a /obtenerAngeles; de lo contrario a /login.
 app.get("/", (req, res) => {
-    if (req.session && req.session.user) {
-        res.redirect("/obtenerAngeles");
-    } else {
-        res.redirect("/login");
-    }
+    res.render("index");
 });
 
 // ─── Funciones de Sanitización ───────────────────────────────────────────────
