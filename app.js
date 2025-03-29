@@ -224,9 +224,14 @@ app.post("/actualizarAngel/:id", (req, res) => {
     const angelId = req.params.id;
     const { nombre, codigo, jerarquia, captura, estado } = req.body;
 
+    // Validar input
+    if (!validarInput(nombre) || !validarInput(codigo) || !validarInput(captura) || !validarInput(estado)) {
+        return res.status(400).send({ error: "Error: Entrada inválida. No se permiten los caracteres < y >." });
+    }
+
     pool.query(
         "UPDATE angeles SET nombre = $1, codigo = $2, jerarquia = $3, captura = $4, estado = $5 WHERE id = $6",
-        [nombre, codigo, jerarquia, captura, estado, angelId],
+        [sanitize(nombre), sanitize(codigo), jerarquia, sanitize(captura), sanitize(estado), angelId],
         (err) => {
             if (err) {
                 console.error("Error al actualizar el ángel:", err);
