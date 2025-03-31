@@ -131,6 +131,58 @@ function validarInput(input) {
 function sanitize(value) {
     return value.replace(/[<>]/g, ""); // Reemplaza "<" y ">" por nada
 }
+// ─── LOGS ─────────────────────────────────────────────────────
+app.post("/register", (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).send("Falta usuario o contraseña");
+    }
+
+    pool.query("INSERT INTO usuarios (username, password) VALUES ($1, $2)", [username, password], (err) => {
+        if (err) {
+            console.error("❌ Error al registrar:", err);
+            return res.status(500).send("Error en el servidor");
+        }
+
+        req.session.user = { username };
+        req.session.message = "✅ Usuario registrado con éxito";
+        res.redirect("/index.html?exito=1");
+    });
+});
+
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).send("Falta usuario o contraseña");
+    }
+
+    pool.query("SELECT * FROM usuarios WHERE username = $1", [username], (err, result) => {
+        if (err) {
+            console.error("Error en login:", err);
+            return res.status(500).send("Error en el servidor");
+        }
+
+        if (result.rows.length === 0) {
+            return res.status(401).send("Usuario no encontrado");
+        }
+
+        const usuario = result.rows[0];
+
+        if (usuario.password !== password) {
+            return res.status(401).send("Contraseña incorrecta");
+        }
+
+        req.session.user = {
+            id: usuario.id,
+            username: usuario.username
+        };
+
+        req.session.message = "✅ Inicio de sesión exitoso";
+        res.redirect("/index.html?exito=1");
+    });
+});
 
 // ─── RUTAS PARA ÁNGELES ─────────────────────────────────────────────────────
 
