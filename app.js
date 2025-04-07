@@ -68,6 +68,7 @@ app.get("/session", (req, res) => {
 });
 
 // Registro
+// Registro
 app.post("/register", (req, res) => {
     const { username, password, admin_key } = req.body;
 
@@ -79,18 +80,19 @@ app.post("/register", (req, res) => {
         return enviarAlerta(res, "Datos inválidos", false);
     }
 
-    const rol = (admin_key === process.env.ADMIN_KEY) ? "admin" : "user";
+    // Compara admin_key con la clave en el archivo .env
+    const rol = (admin_key === process.env.ADMIN_KEY) ? "admin" : "user";  // Si la clave es correcta, el rol es "admin"
 
     pool.query(
         "INSERT INTO usuarios (username, password, rol) VALUES ($1, $2, $3)",
         [sanitize(username), sanitize(password), rol],
         (err) => {
-        if (err) {
-            console.error("Error al registrar:", err);
-            return enviarAlerta(res, "Error al registrar usuario", false);
-        }
-        req.session.user = { username, rol };
-        enviarAlerta(res, "Registro exitoso");
+            if (err) {
+                console.error("Error al registrar:", err);
+                return enviarAlerta(res, "Error al registrar usuario", false);
+            }
+            req.session.user = { username, rol };  // Asigna el rol correcto al usuario en sesión
+            enviarAlerta(res, "Registro exitoso");
         }
     );
 });
@@ -260,17 +262,17 @@ app.get("/obtenerExperimentos", (req, res) => {
 
 // Ver Usuarios (solo admins)
 app.get("/obtenerUsuarios", (req, res) => {
-if (!req.session.user || req.session.user.rol !== "admin") {
-    return enviarAlerta(res, "Acceso denegado", false);
-}
-
-pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
-    if (err) {
-    console.error("Error al obtener usuarios:", err);
-    return enviarAlerta(res, "Error al obtener usuarios", false);
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return enviarAlerta(res, "Acceso denegado", false); // Acceso denegado si no es admin
     }
-    res.json(result.rows);
-});
+
+    pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
+        if (err) {
+            console.error("Error al obtener usuarios:", err);
+            return enviarAlerta(res, "Error al obtener usuarios", false);
+        }
+        res.json(result.rows);  // Devolver los datos de los usuarios
+    });
 });
 
 // Editar Usuarios (solo admins)
