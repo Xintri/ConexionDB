@@ -215,7 +215,7 @@ app.post("/editarAngel", (req, res) => {
 // Obtener y mostrar los ángeles
 app.get("/obtenerAngeles", (req, res) => {
     if (!req.session.user) {
-        return res.status(401).json({ mensaje: "No autorizado" });  // Verifica si el usuario está autenticado
+        return res.status(401).json({ mensaje: "No autorizado" });
     }
 
     pool.query("SELECT * FROM angeles", (err, result) => {
