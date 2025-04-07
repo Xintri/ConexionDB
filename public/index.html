@@ -6,45 +6,29 @@
     <title>Proyecto Ángel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            fetch('/session')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.loggedIn) {
+                    window.location.href = '/login.html';  // Redirigir si no está autenticado
+                }
+            });
+        });
+    </script>
 </head>
 
 <body class="min-vh-100">
-    <div class="container text-center py-5">
+    <div class="container text-center">
 
-        <!-- 🔐 LOGIN Y REGISTRO -->
-        <section id="authSection" style="display: none;">
-            <h2>[🔐 Autenticación Requerida]</h2>
-            <div class="row">
-                <!-- Registro -->
-                <div class="col-md-6 mb-4">
-                    <h4>Registro</h4>
-                    <form action="/register" method="post">
-                        <input type="text" name="username" placeholder="Usuario" class="form-control mb-2" required>
-                        <input type="password" name="password" placeholder="Contraseña" class="form-control mb-2" required>
-                        <input type="text" name="admin_key" placeholder="Clave secreta de admin (opcional)" class="form-control mb-2">
-                        <button class="btn btn-success w-100">Registrarse</button>
-                    </form>
-                </div>
-
-                <!-- Login -->
-                <div class="col-md-6 mb-4">
-                    <h4>Iniciar Sesión</h4>
-                    <form action="/login" method="post">
-                        <input type="text" name="username" placeholder="Usuario" class="form-control mb-2" required>
-                        <input type="password" name="password" placeholder="Contraseña" class="form-control mb-2" required>
-                        <button class="btn btn-primary w-100">Iniciar Sesión</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- 🧪 CONTENIDO PRINCIPAL -->
-        <section id="mainSection" style="display: none;">
-            <h1>[🔴 ACCESO RESTRINGIDO]</h1>
-            <p>Advertencia: Información clasificada. Proceda con precaución.</p>
+        <!-- Sección de contenido para usuarios autenticados -->
+        <section id="mainSection" style="display: block;">
+            <h1 class="glitch">[🔴 ACCESO RESTRINGIDO]</h1>
+            <p class="alert-hack">Advertencia: Información clasificada. Proceda con precaución.</p>
             <hr>
 
-            <!-- 📌 Registrar Ángel -->
             <h2>📌 Registrar un Ángel</h2>
             <form action="/agregarAngel" method="post" class="mb-4">
                 <input type="text" name="nombre" placeholder="Nombre del Ángel" class="form-control mb-2" required>
@@ -69,12 +53,11 @@
                     <option value="En cuarentena">En cuarentena</option>
                     <option value="Desaparecido">Desaparecido</option>
                 </select>
-                <button class="btn btn-success w-100">Registrar Ángel</button>
+                <input type="submit" value="Registrar" class="btn btn-glitch w-100">
             </form>
 
             <hr>
 
-            <!-- 🧪 Registrar Experimento -->
             <h2>🧪 Registrar Experimento</h2>
             <form action="/agregarExperimento" method="post" class="mb-4">
                 <input type="number" name="numero_experimento" placeholder="Número del Experimento" class="form-control mb-2" required>
@@ -88,43 +71,34 @@
                 </select>
                 <input type="text" name="descripcion" placeholder="Descripción del experimento" class="form-control mb-2" required>
                 <input type="text" name="resultado" placeholder="Resultado del experimento" class="form-control mb-2" required>
-                <button class="btn btn-success w-100">Registrar Experimento</button>
+                <input type="submit" value="Registrar" class="btn btn-glitch w-100">
             </form>
 
             <hr>
 
-            <!-- 📑 Ver Ángeles Registrados -->
             <h2>📑 Lista de Ángeles Registrados</h2>
             <a href="/obtenerAngeles">
-                <button class="btn btn-primary w-100 mb-3">Ver Ángeles</button>
+                <button class="btn btn-glitch w-100">Ver Ángeles Registrados</button>
             </a>
 
             <hr>
 
-            <!-- 📑 Ver Experimentos Registrados -->
             <h2>📑 Lista de Todos los Experimentos</h2>
             <a href="/obtenerExperimentos">
-                <button class="btn btn-primary w-100 mb-3">Ver Experimentos</button>
+                <button class="btn btn-glitch w-100">Ver Todos los Experimentos</button>
             </a>
 
             <hr>
-
-            <!-- 🔒 Cerrar Sesión -->
-            <a href="/logout">
-                <button class="btn btn-danger w-100">Cerrar Sesión</button>
-            </a>
-        </section>
-
-        <!-- 👑 Sección exclusiva para Admins -->
-        <section id="adminSection" style="display: none;">
-            <hr>
-            <h2>👑 Gestión de Usuarios (Sólo Admins)</h2>
-
+            
+            <!-- Si es admin, se mostrarán estas opciones -->
+            <h2>👑 Gestión de Usuarios (Solo Admin)</h2>
             <a href="/obtenerUsuarios">
-                <button class="btn btn-warning w-100 mb-3">Ver Usuarios</button>
+                <button class="btn btn-glitch w-100">Ver Usuarios Registrados</button>
             </a>
-        </section>
 
+            <hr>
+            <a href="/logout"><button class="btn btn-danger w-100">Cerrar sesión</button></a>
+        </section>
     </div>
 </body>
 </html>

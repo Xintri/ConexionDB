@@ -43,22 +43,28 @@ function enviarAlerta(res, mensaje, exito = true) {
     res.redirect(`/?mensaje=${encodeURIComponent(mensaje)}&exito=${exito}`);
 }
 
-// Mostrar el index.html siempre
+// Mostrar la página de login o index
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    if (req.session.user) {
+        // Si el usuario está autenticado, mostrar el index
+        res.sendFile(path.join(__dirname, "public", "index.html"));
+    } else {
+        // Si el usuario no está autenticado, redirigir al login
+        res.sendFile(path.join(__dirname, "public", "login.html"));
+    }
 });
 
 // Obtener datos de sesión
 app.get("/session", (req, res) => {
     if (req.session.user) {
-    res.json({
-        loggedIn: true,
-        username: req.session.user.username,
-        rol: req.session.user.rol
-    });
+        res.json({
+            loggedIn: true,
+            username: req.session.user.username,
+            rol: req.session.user.rol
+        });
     } else {
         res.json({ loggedIn: false });
-}
+    }
 });
 
 // Registro
@@ -130,7 +136,7 @@ app.post("/login", (req, res) => {
 // Logout
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
-        res.redirect("/");
+        res.redirect("/login.html");  // Redirigir al login después de cerrar sesión
     });
 });
 
@@ -160,14 +166,14 @@ app.post("/agregarAngel", (req, res) => {
 
 // Editar Ángel
 app.post("/editarAngel", (req, res) => {
-        if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
-    
-        const { id, nombre, codigo, jerarquia, captura, estado } = req.body;
-        if (!id || !nombre || !codigo || !jerarquia || !captura || !estado) {
+    if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
+
+    const { id, nombre, codigo, jerarquia, captura, estado } = req.body;
+    if (!id || !nombre || !codigo || !jerarquia || !captura || !estado) {
         return enviarAlerta(res, "Faltan datos para editar ángel", false);
-        }
-    
-        pool.query(
+    }
+
+    pool.query(
         "UPDATE angeles SET nombre = $1, codigo = $2, jerarquia = $3, captura = $4, estado = $5 WHERE id = $6",
         [sanitize(nombre), sanitize(codigo), sanitize(jerarquia), sanitize(captura), sanitize(estado), id],
         (err) => {
@@ -177,7 +183,7 @@ app.post("/editarAngel", (req, res) => {
             }
             enviarAlerta(res, "Ángel editado exitosamente");
         }
-        );
+    );
 });
 
 // Añadir Experimento
