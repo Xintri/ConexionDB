@@ -3,24 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch('/session')
         .then(response => response.json())
         .then(data => {
-            // Redirigir si no está autenticado y no estamos en la página de login
             if (!data.loggedIn && window.location.pathname !== '/login.html') {
-                window.location.href = '/login.html';
+                window.location.href = '/login.html';  // Redirigir a login.html si no está autenticado
             }
-
-            // Redirigir si ya está autenticado y estamos en login.html
-            if (data.loggedIn && window.location.pathname !== '/') {
-                window.location.href = '/';
+            if (data.loggedIn && window.location.pathname === '/login.html') {
+                window.location.href = '/';  // Redirigir a index.html si ya está autenticado
             }
-
-            // Ocultar la sección de "Ver Usuarios" si el rol no es admin
-            if (data.rol !== 'admin') {
-                const usersSection = document.getElementById('usersSection');
-                if (usersSection) {
-                    usersSection.style.display = 'none';  // Ocultar la sección de usuarios
-                }
-            }
+        })
+        .catch(error => {
+            console.error('Error al verificar la sesión:', error);
         });
+});
 
     // Obtener y mostrar los ángeles
     fetch('/obtenerAngeles')

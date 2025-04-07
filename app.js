@@ -46,9 +46,24 @@ function enviarAlerta(res, mensaje, exito = true) {
 // Mostrar la página de login o index
 app.get("/", (req, res) => {
     if (req.session.user) {
+        // Si el usuario está autenticado, mostrar el index
         res.sendFile(path.join(__dirname, "public", "index.html"));
     } else {
-        res.sendFile(path.join(__dirname, "public", "login.html"));
+        // Si el usuario no está autenticado, redirigir al login
+        res.redirect("/login.html");  // Aquí usamos `redirect` para redirigir correctamente
+    }
+});
+
+// Verificar sesión en la ruta /session
+app.get("/session", (req, res) => {
+    if (req.session.user) {
+        res.json({
+            loggedIn: true,
+            username: req.session.user.username,
+            rol: req.session.user.rol
+        });
+    } else {
+        res.json({ loggedIn: false });
     }
 });
 
