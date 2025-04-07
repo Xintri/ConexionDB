@@ -227,7 +227,6 @@ app.get("/obtenerAngeles", (req, res) => {
     });
 });
 
-// Ruta para ver la lista de ángeles
 app.get("/verAngeles", (req, res) => {
     if (!req.session.user) {
         return res.redirect("/login.html");  // Redirigir al login si no está autenticado
@@ -238,9 +237,10 @@ app.get("/verAngeles", (req, res) => {
             console.error("Error al obtener ángeles:", err);
             return res.status(500).send("Error al obtener ángeles");
         }
-        res.render("verAngeles", { angeles: result.rows });  // Mostrar ángeles en una tabla
+        res.sendFile(path.join(__dirname, "public", "verAngeles.html"));  // Mostrar la página con los ángeles
     });
 });
+
 
 // Ruta para editar un ángel
 app.post("/editarAngel", (req, res) => {
@@ -387,18 +387,18 @@ app.post("/eliminarExperimento", (req, res) => {
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
 
-// Ver Usuarios (solo admins)
-app.get("/obtenerUsuarios", (req, res) => {
+// Ruta para ver la lista de usuarios (solo admin)
+app.get("/verUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return enviarAlerta(res, "Acceso denegado", false); // Acceso denegado si no es admin
+        return res.redirect("/login.html");  // Redirigir al login si no es admin
     }
 
     pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
         if (err) {
             console.error("Error al obtener usuarios:", err);
-            return enviarAlerta(res, "Error al obtener usuarios", false);
+            return res.status(500).send("Error al obtener usuarios");
         }
-        res.json(result.rows);  // Devolver los datos de los usuarios
+        res.sendFile(path.join(__dirname, "public", "verUsuarios.html"));
     });
 });
 

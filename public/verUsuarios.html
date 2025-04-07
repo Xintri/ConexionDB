@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Registrados</title>
+    <link rel="stylesheet" href="/usuarios.css">
+</head>
+<body class="index-body">
+    <div class="index-container text-center">
+        <h1 class="glitch">[🔴 LISTA DE USUARIOS]</h1>
+        <hr>
+
+        <h2>📑 Usuarios Registrados</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre de Usuario</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <!-- Los usuarios serán agregados aquí dinámicamente -->
+            </tbody>
+        </table>
+
+        <hr>
+        <a href="/logout"><button class="btn btn-danger w-100">Cerrar sesión</button></a>
+    </div>
+
+    <script src="/scripts.js"></script>
+</body>
+</html>
