@@ -2,7 +2,7 @@
 .index-body {
     background-color: #0a0a0a;
     color: #d1d1d1;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Arial, sans-serif; /* Cambié a fuente más estándar */
     text-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
     overflow-x: hidden;
     min-height: 100vh;
@@ -10,14 +10,14 @@
     justify-content: center;
     align-items: center;  /* Centrado vertical y horizontal */
     padding: 20px;
-    visibility: hidden;  /* Ocultar hasta que todo esté listo */
+    visibility: visible;  /* Aseguramos que se vea correctamente desde el inicio */
 }
 
 /* 🔥 Estilo general para login.html */
 .login-body {
     background-color: #121212;
     color: #d1d1d1;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Arial, sans-serif; /* Cambié a fuente más estándar */
     text-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
     overflow-x: hidden;
     min-height: 100vh;
@@ -30,7 +30,8 @@
 /* 🔥 Contenedor principal para index.html */
 .index-container {
     width: 100%;
-    max-width: 900px;
+    max-width: 600px; /* Ajustamos el tamaño para pantallas pequeñas */
+    margin: 0 auto;   /* Centramos el contenedor */
     background: rgba(20, 20, 20, 0.95);
     padding: 30px;
     border-radius: 12px;
@@ -43,6 +44,7 @@
 .login-container {
     width: 100%;
     max-width: 500px;
+    margin: 0 auto;   /* Centramos el contenedor */
     background: rgba(20, 20, 20, 0.95);
     padding: 30px;
     border-radius: 12px;
@@ -62,7 +64,7 @@ h1, h2 {
 
 /* 🔥 Glitch Animation */
 .glitch {
-    animation: glitch 1.5s infinite;
+    animation: glitch 1s infinite;  /* Reducido la duración de la animación */
 }
 
 @keyframes glitch {
@@ -80,7 +82,7 @@ input, select, textarea {
     background-color: #111;
     color: #f1f1f1;
     border: 1px solid #ff0000;
-    padding: 10px;
+    padding: 12px; /* Aumentado el padding */
     margin-bottom: 15px;
     border-radius: 8px;
     width: 100%;
@@ -99,7 +101,7 @@ textarea {
 button, .btn-glitch {
     background: linear-gradient(90deg, #ff0000, #990000);
     border: none;
-    padding: 10px 20px;
+    padding: 12px; /* Aumentado el tamaño del botón */
     color: white;
     font-weight: bold;
     font-size: 1rem;
