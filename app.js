@@ -280,37 +280,6 @@ app.get("/editarAngel/:id", (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).send("Ángel no encontrado");
         }
-        // Si se encuentra el ángel, mostrar formulario de edición
-        const angel = result.rows[0];
-        res.send(`
-            <form action="/editarAngel" method="POST">
-                <input type="hidden" name="id" value="${angel.id}">
-                <input type="text" name="nombre" value="${angel.nombre}">
-                <input type="text" name="codigo" value="${angel.codigo}">
-                <input type="text" name="jerarquia" value="${angel.jerarquia}">
-                <textarea name="captura">${angel.captura}</textarea>
-                <input type="text" name="estado" value="${angel.estado}">
-                <button type="submit">Actualizar Ángel</button>
-            </form>
-        `);
-    });
-});
-
-// Ruta para editar un ángel (solo admins)
-app.get("/editarAngel/:id", (req, res) => {
-    if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
-    }
-
-    const { id } = req.params;
-    pool.query("SELECT * FROM angeles WHERE id = $1", [id], (err, result) => {
-        if (err) {
-            console.error("Error al obtener ángel:", err);
-            return res.status(500).send("Error al obtener ángel");
-        }
-        if (result.rows.length === 0) {
-            return res.status(404).send("Ángel no encontrado");
-        }
 
         const angel = result.rows[0];
         res.send(`
