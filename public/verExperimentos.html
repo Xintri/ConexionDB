@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Experimentos</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>Lista de Todos los Experimentos</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>Resultado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="experimentsTableBody">
+            <!-- Aquí se llenarán las filas con los datos de los experimentos -->
+        </tbody>
+    </table>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('/obtenerExperimentos')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('experimentsTableBody');
+                    data.forEach(experiment => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${experiment.numero_experimento}</td>
+                            <td>${experiment.tipo_experimento}</td>
+                            <td>${experiment.descripcion}</td>
+                            <td>${experiment.resultado}</td>
+                            <td>
+                                <form action="/editarExperimento" method="POST">
+                                    <input type="hidden" name="id" value="${experiment.id}">
+                                    <button type="submit" class="btn">Editar</button>
+                                </form>
+                                <form action="/eliminarExperimento" method="POST">
+                                    <input type="hidden" name="id" value="${experiment.id}">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error al obtener experimentos:', error));
+        });
+    </script>
+</body>
+</html>

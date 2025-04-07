@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Ángeles</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <h1>Lista de Ángeles Registrados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Jerarquía</th>
+                <th>Captura</th>
+                <th>Estado</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="angelsTableBody">
+            <!-- Aquí se llenarán las filas con los datos de los ángeles -->
+        </tbody>
+    </table>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('/obtenerAngeles')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('angelsTableBody');
+                    data.forEach(angel => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${angel.id}</td>
+                            <td>${angel.nombre}</td>
+                            <td>${angel.codigo}</td>
+                            <td>${angel.jerarquia}</td>
+                            <td>${angel.captura}</td>
+                            <td>${angel.estado}</td>
+                            <td>${angel.fecha_registro}</td>
+                            <td>
+                                <form action="/editarAngel" method="POST">
+                                    <input type="hidden" name="id" value="${angel.id}">
+                                    <button type="submit" class="btn">Editar</button>
+                                </form>
+                                <form action="/eliminarAngel" method="POST">
+                                    <input type="hidden" name="id" value="${angel.id}">
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error al obtener ángeles:', error));
+        });
+    </script>
+</body>
+</html>

@@ -227,6 +227,55 @@ app.get("/obtenerAngeles", (req, res) => {
     });
 });
 
+// Ruta para ver la lista de ángeles
+app.get("/verAngeles", (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login.html");  // Redirigir al login si no está autenticado
+    }
+
+    pool.query("SELECT * FROM angeles", (err, result) => {
+        if (err) {
+            console.error("Error al obtener ángeles:", err);
+            return res.status(500).send("Error al obtener ángeles");
+        }
+        res.render("verAngeles", { angeles: result.rows });  // Mostrar ángeles en una tabla
+    });
+});
+
+// Ruta para editar un ángel
+app.post("/editarAngel", (req, res) => {
+    const { id, nombre, codigo, jerarquia, captura, estado } = req.body;
+    if (!id || !nombre || !codigo || !jerarquia || !captura || !estado) {
+        return res.status(400).send("Faltan datos para editar el ángel");
+    }
+
+    pool.query(
+        "UPDATE angeles SET nombre = $1, codigo = $2, jerarquia = $3, captura = $4, estado = $5 WHERE id = $6",
+        [nombre, codigo, jerarquia, captura, estado, id],
+        (err) => {
+            if (err) {
+                console.error("Error al editar ángel:", err);
+                return res.status(500).send("Error al editar ángel");
+            }
+            res.redirect("/verAngeles");
+        }
+    );
+});
+
+// Ruta para eliminar un ángel
+app.post("/eliminarAngel", (req, res) => {
+    const { id } = req.body;
+
+    pool.query("DELETE FROM angeles WHERE id = $1", [id], (err) => {
+        if (err) {
+            console.error("Error al eliminar ángel:", err);
+            return res.status(500).send("Error al eliminar ángel");
+        }
+        res.redirect("/verAngeles");
+    });
+});
+
+
 
 // Añadir Experimento
 app.post("/agregarExperimento", (req, res) => {
@@ -286,6 +335,55 @@ app.get("/obtenerExperimentos", (req, res) => {
         res.json(result.rows);  // Devuelve los datos de los experimentos
     });
 });
+
+// Ruta para ver la lista de experimentos
+app.get("/verExperimentos", (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login.html");  // Redirigir al login si no está autenticado
+    }
+
+    pool.query("SELECT * FROM experimentos", (err, result) => {
+        if (err) {
+            console.error("Error al obtener experimentos:", err);
+            return res.status(500).send("Error al obtener experimentos");
+        }
+        res.sendFile(path.join(__dirname, "public", "verExperimentos.html"));  // Mostrar la página con los experimentos
+    });
+});
+
+// Ruta para editar un experimento
+app.post("/editarExperimento", (req, res) => {
+    const { id, numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
+    if (!id || !numero_experimento || !tipo_experimento || !descripcion || !resultado) {
+        return res.status(400).send("Faltan datos para editar el experimento");
+    }
+
+    pool.query(
+        "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
+        [numero_experimento, tipo_experimento, descripcion, resultado, id],
+        (err) => {
+            if (err) {
+                console.error("Error al editar experimento:", err);
+                return res.status(500).send("Error al editar experimento");
+            }
+            res.redirect("/verExperimentos");
+        }
+    );
+});
+
+// Ruta para eliminar un experimento
+app.post("/eliminarExperimento", (req, res) => {
+    const { id } = req.body;
+
+    pool.query("DELETE FROM experimentos WHERE id = $1", [id], (err) => {
+        if (err) {
+            console.error("Error al eliminar experimento:", err);
+            return res.status(500).send("Error al eliminar experimento");
+        }
+        res.redirect("/verExperimentos");
+    });
+});
+
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
 
