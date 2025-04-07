@@ -45,42 +45,42 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => console.error('Error al obtener ángeles:', error));
 
-// Obtener y mostrar los experimentos
-fetch('/obtenerExperimentos')
-    .then(response => response.json())
-    .then(data => {
-        const experimentsTableBody = document.getElementById('experimentsTableBody');
-        data.forEach(experiment => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${experiment.numero_experimento}</td>
-                <td>${experiment.tipo_experimento}</td>
-                <td>${experiment.descripcion}</td>
-                <td>${experiment.resultado}</td>
-            `;
-            experimentsTableBody.appendChild(row);
-        });
-    })
-    .catch(error => console.error('Error al obtener experimentos:', error));
+    // Obtener y mostrar los experimentos
+    fetch('/obtenerExperimentos')
+        .then(response => response.json())
+        .then(data => {
+            const experimentsTableBody = document.getElementById('experimentsTableBody');
+            data.forEach(experiment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${experiment.numero_experimento}</td>
+                    <td>${experiment.tipo_experimento}</td>
+                    <td>${experiment.descripcion}</td>
+                    <td>${experiment.resultado}</td>
+                `;
+                experimentsTableBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error al obtener experimentos:', error));
 
-// Obtener y mostrar los usuarios
-fetch('/obtenerUsuarios')
-    .then(response => response.json())
-    .then(data => {
-        const usersTableBody = document.getElementById('usersTableBody');
-        data.forEach(user => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${user.id}</td>
-                <td>${user.username}</td>
-                <td>${user.rol}</td>
-                <td>
-                    <button class="btn btn-warning">Editar</button>
-                    <button class="btn btn-danger">Eliminar</button>
-                </td>
-            `;
-            usersTableBody.appendChild(row);
-        });
-    })
-    .catch(error => console.error('Error al obtener usuarios:', error));
+    // Obtener y mostrar los usuarios
+    fetch('/obtenerUsuarios')
+        .then(response => response.json())
+        .then(data => {
+            const usersTableBody = document.getElementById('usersTableBody');
+            data.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.rol}</td>
+                    <td>
+                        <button class="btn btn-warning">Editar</button>
+                        <button class="btn btn-danger">Eliminar</button>
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error al obtener usuarios:', error));
 });

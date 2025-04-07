@@ -406,16 +406,8 @@ app.get("/verUsuarios", (req, res) => {
         return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
     }
 
-    // Obtener los usuarios
-    pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
-        if (err) {
-            console.error("Error al obtener usuarios:", err);
-            return res.status(500).send("Error al obtener usuarios");
-        }
-        
-        // Pasar los datos de los usuarios al HTML
-        res.render("verUsuarios", { users: result.rows });  // Pasa los usuarios a la vista
-    });
+    // Servir el archivo HTML estático
+    res.sendFile(path.join(__dirname, "public", "verUsuarios.html"));
 });
 
 // Editar Usuario (solo admins)
