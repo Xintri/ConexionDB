@@ -147,11 +147,16 @@ app.post("/login", (req, res) => {
 });
 
 // Logout
+// Logout
 app.get("/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/login.html");
+    req.session.destroy((err) => {
+        if (err) {
+            return res.redirect("/");  // En caso de error al destruir la sesión, redirigir al home
+        }
+        res.redirect("/login.html");  // Redirigir al login después de cerrar sesión
     });
 });
+
 
 // ---- Rutas para usuarios normales y admins ----
 

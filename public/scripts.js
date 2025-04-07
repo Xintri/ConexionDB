@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => {
             console.error('Error al verificar la sesión:', error);
         });
-});
+
 
     // Obtener y mostrar los ángeles
     fetch('/obtenerAngeles')
