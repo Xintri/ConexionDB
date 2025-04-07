@@ -116,7 +116,6 @@ app.post("/register", (req, res) => {
     );
 });
 
-
 // Login
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
@@ -167,7 +166,7 @@ app.get("/logout", (req, res) => {
 
 
 // ---- Rutas para usuarios normales y admins ----
-
+// ---- ANGELES ----
 
 // Añadir Ángel
 app.post("/agregarAngel", (req, res) => {
@@ -182,90 +181,16 @@ app.post("/agregarAngel", (req, res) => {
         "INSERT INTO angeles (nombre, codigo, jerarquia, captura, estado) VALUES ($1, $2, $3, $4, $5)",
         [sanitize(nombre), sanitize(codigo), sanitize(jerarquia), sanitize(captura), sanitize(estado)],
         (err) => {
-        if (err) {
-            console.error("Error al agregar ángel:", err);
-            return enviarAlerta(res, "Error al registrar ángel", false);
-        }
-        enviarAlerta(res, "Ángel registrado exitosamente");
+            if (err) {
+                console.error("Error al agregar ángel:", err);
+                return enviarAlerta(res, "Error al registrar ángel", false);
+            }
+            enviarAlerta(res, "Ángel registrado exitosamente");
         }
     );
 });
 
-// Obtener y mostrar los ángeles
-app.get("/obtenerAngeles", (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ mensaje: "No autorizado" });  // Verifica si el usuario está autenticado
-    }
-
-    pool.query("SELECT * FROM angeles", (err, result) => {
-        if (err) {
-            console.error("❌ Error al obtener ángeles:", err);
-            return res.status(500).send("Error al obtener ángeles");
-        }
-
-        // 🔥 Usar result.rows para generar la tabla dinámica
-        let tablaAngeles = `
-            <table class="table table-dark table-bordered table-hover text-center">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Código</th>
-                        <th>Jerarquía</th>
-                        <th>Captura</th>
-                        <th>Estado</th>
-                        <th>Fecha de Registro</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-        result.rows.forEach(angel => {
-            tablaAngeles += `
-                <tr>
-                    <td>${angel.id}</td>
-                    <td>${angel.nombre}</td>
-                    <td>${angel.codigo}</td>
-                    <td>${angel.jerarquia}</td>
-                    <td>${angel.captura}</td>
-                    <td>${angel.estado}</td>
-                    <td>${angel.fecha_registro}</td>
-                    <td>
-                        <a href="/editarAngel/${angel.id}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="/eliminarAngel/${angel.id}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>`;
-        });
-
-        tablaAngeles += `</tbody></table>`;
-
-        res.send(`
-            <!DOCTYPE html>
-            <html lang="es">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Ángeles Registrados</title>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="/styles.css">
-            </head>
-            <body class="min-vh-100">
-                <div class="container text-center">
-                    <h2 class="glitch">Lista de Ángeles Registrados</h2>
-                    ${tablaAngeles}
-                    <div class="mt-4">
-                        <a href="/">
-                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
-                        </a>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `);
-    });
-});
-
-// Ruta para ver la lista de ángeles
+// Obtener y mostrar los ángeles (cualquier usuario autenticado)
 app.get("/verAngeles", (req, res) => {
     if (!req.session.user) {
         return res.redirect("/login.html"); // Redirigir al login si no está autenticado
@@ -277,7 +202,6 @@ app.get("/verAngeles", (req, res) => {
             return res.status(500).send("Error al obtener ángeles");
         }
 
-        // Código HTML actualizado para la tabla de Ángeles
         let tablaAngeles = `
         <table class="table table-dark table-bordered table-hover text-center">
             <thead>
@@ -294,8 +218,8 @@ app.get("/verAngeles", (req, res) => {
             </thead>
             <tbody>`;
 
-        resultados.rows.forEach(angel => {
-        tablaAngeles += `
+        result.rows.forEach(angel => {
+            tablaAngeles += `
             <tr>
                 <td>${angel.id}</td>
                 <td>${angel.nombre}</td>
@@ -312,7 +236,6 @@ app.get("/verAngeles", (req, res) => {
         });
 
         tablaAngeles += `</tbody></table>`;
-
 
         res.send(`
             <!DOCTYPE html>
@@ -408,6 +331,8 @@ app.post("/eliminarAngel/:id", (req, res) => {
 });
 
 
+// ---- EXPERIMENTOS ----
+
 // Añadir Experimento
 app.post("/agregarExperimento", (req, res) => {
     if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
@@ -430,76 +355,7 @@ app.post("/agregarExperimento", (req, res) => {
     );
 });
 
-
-// Obtener y mostrar los experimentos
-app.get("/obtenerExperimentos", (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ mensaje: "No autorizado" });  // Verifica si el usuario está autenticado
-    }
-
-    pool.query("SELECT * FROM experimentos", (err, result) => {
-        if (err) {
-            console.error("❌ Error al obtener experimentos:", err);
-            return res.status(500).send("Error al obtener experimentos");
-        }
-
-        // 🔥 Usar result.rows para generar la tabla dinámica
-        let tablaExperimentos = `
-            <table class="table table-dark table-bordered table-hover text-center">
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Tipo</th>
-                        <th>Descripción</th>
-                        <th>Resultado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-        result.rows.forEach(experiment => {
-            tablaExperimentos += `
-                <tr>
-                    <td>${experiment.numero_experimento}</td>
-                    <td>${experiment.tipo_experimento}</td>
-                    <td>${experiment.descripcion}</td>
-                    <td>${experiment.resultado}</td>
-                    <td>
-                        <a href="/editarExperimento/${experiment.id}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="/eliminarExperimento/${experiment.id}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>`;
-        });
-
-        tablaExperimentos += `</tbody></table>`;
-
-        res.send(`
-            <!DOCTYPE html>
-            <html lang="es">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Experimentos Registrados</title>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="/styles.css">
-            </head>
-            <body class="min-vh-100">
-                <div class="container text-center">
-                    <h2 class="glitch">Lista de Experimentos Registrados</h2>
-                    ${tablaExperimentos}
-                    <div class="mt-4">
-                        <a href="/">
-                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
-                        </a>
-                    </div>
-                </div>
-            </body>
-            </html>
-        `);
-    });
-});
-
-// Ruta para ver la lista de experimentos
+// Obtener y mostrar los experimentos (cualquier usuario autenticado)
 app.get("/verExperimentos", (req, res) => {
     if (!req.session.user) {
         return res.redirect("/login.html"); // Redirigir al login si no está autenticado
@@ -511,7 +367,6 @@ app.get("/verExperimentos", (req, res) => {
             return res.status(500).send("Error al obtener experimentos");
         }
 
-        // Código HTML actualizado para la tabla de Experimentos
         let tablaExperimentos = `
         <table class="table table-dark table-bordered table-hover text-center">
             <thead>
@@ -525,8 +380,8 @@ app.get("/verExperimentos", (req, res) => {
             </thead>
             <tbody>`;
 
-        resultados.rows.forEach(experiment => {
-        tablaExperimentos += `
+        result.rows.forEach(experiment => {
+            tablaExperimentos += `
             <tr>
                 <td>${experiment.numero_experimento}</td>
                 <td>${experiment.tipo_experimento}</td>
@@ -540,7 +395,6 @@ app.get("/verExperimentos", (req, res) => {
         });
 
         tablaExperimentos += `</tbody></table>`;
-
 
         res.send(`
             <!DOCTYPE html>
@@ -583,7 +437,6 @@ app.get("/editarExperimento/:id", (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).send("Experimento no encontrado");
         }
-        // Si se encuentra el experimento, mostrar formulario de edición
         const experiment = result.rows[0];
         res.send(`
             <form action="/editarExperimento" method="POST">
@@ -638,19 +491,42 @@ app.post("/eliminarExperimento/:id", (req, res) => {
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
 
-// Obtener usuarios (para mostrar en la tabla)
-app.get("/obtenerUsuarios", (req, res) => {
+// Añadir Usuario
+app.post("/agregarUsuario", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
+        return enviarAlerta(res, "No autorizado", false);
+    }
+
+    const { username, password, rol } = req.body;
+    if (!username || !password || !rol) {
+        return enviarAlerta(res, "Faltan datos para registrar usuario", false);
+    }
+
+    pool.query(
+        "INSERT INTO usuarios (username, password, rol) VALUES ($1, $2, $3)",
+        [sanitize(username), sanitize(password), sanitize(rol)],
+        (err) => {
+            if (err) {
+                console.error("Error al agregar usuario:", err);
+                return enviarAlerta(res, "Error al registrar usuario", false);
+            }
+            enviarAlerta(res, "Usuario registrado exitosamente");
+        }
+    );
+});
+
+// Obtener y mostrar los usuarios
+app.get("/verUsuarios", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir al login si no está autenticado o no es admin
     }
 
     pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
         if (err) {
             console.error("Error al obtener usuarios:", err);
-            return res.status(500).json({ mensaje: "Error al obtener usuarios" });
+            return res.status(500).send("Error al obtener usuarios");
         }
 
-        // Código HTML actualizado para la tabla de Usuarios
         let tablaUsuarios = `
         <table class="table table-dark table-bordered table-hover text-center">
             <thead>
@@ -663,8 +539,8 @@ app.get("/obtenerUsuarios", (req, res) => {
             </thead>
             <tbody>`;
 
-        resultados.rows.forEach(user => {
-        tablaUsuarios += `
+        result.rows.forEach(user => {
+            tablaUsuarios += `
             <tr>
                 <td>${user.id}</td>
                 <td>${user.username}</td>
@@ -704,67 +580,6 @@ app.get("/obtenerUsuarios", (req, res) => {
     });
 });
 
-// Ruta para ver la lista de usuarios (solo admins)
-app.get("/verUsuarios", (req, res) => {
-    if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
-    }
-
-    // Obtener los usuarios
-    pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
-        if (err) {
-            console.error("Error al obtener usuarios:", err);
-            return res.status(500).send("Error al obtener usuarios");
-        }
-
-        // Pasar los datos de los usuarios y el rol al HTML
-        res.send(`
-            <!DOCTYPE html>
-            <html lang="es">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Usuarios Registrados</title>
-                <link rel="stylesheet" href="/styles.css">
-            </head>
-            <body>
-                <h1>Usuarios Registrados</h1>
-                ${req.session.user.rol === "admin" ? `
-                    <a href="/verUsuarios">
-                        <button class="btn btn-primary">Ver Usuarios</button>
-                    </a>
-                ` : ''}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre de Usuario</th>
-                            <th>Rol</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${result.rows.map(user => `
-                            <tr>
-                                <td>${user.id}</td>
-                                <td>${user.username}</td>
-                                <td>${user.rol}</td>
-                                <td>
-                                    <button class="btn btn-warning">Editar</button>
-                                    <button class="btn btn-danger">Eliminar</button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <hr>
-                <a href="/logout"><button class="btn btn-danger">Cerrar sesión</button></a>
-            </body>
-            </html>
-        `);
-    });
-});
-
 // Ruta para editar un usuario (solo admins)
 app.get("/editarUsuario/:id", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
@@ -780,7 +595,6 @@ app.get("/editarUsuario/:id", (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).send("Usuario no encontrado");
         }
-        // Si se encuentra el usuario, mostrar formulario de edición
         const user = result.rows[0];
         res.send(`
             <form action="/editarUsuario" method="POST">
@@ -831,6 +645,7 @@ app.post("/eliminarUsuario/:id", (req, res) => {
         res.redirect("/verUsuarios");
     });
 });
+
 
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
