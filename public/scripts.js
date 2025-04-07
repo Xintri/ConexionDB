@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('Error al verificar la sesión:', error);
         });
 
-    // Obtener y mostrar los ángeles
     fetch('/obtenerAngeles')
         .then(response => response.json())
         .then(data => {

@@ -212,6 +212,22 @@ app.post("/editarAngel", (req, res) => {
     );
 });
 
+// Obtener y mostrar los ángeles
+app.get("/obtenerAngeles", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ mensaje: "No autorizado" });  // Verifica si el usuario está autenticado
+    }
+
+    pool.query("SELECT * FROM angeles", (err, result) => {
+        if (err) {
+            console.error("Error al obtener ángeles:", err);
+            return res.status(500).json({ mensaje: "Error al obtener ángeles" });
+        }
+        res.json(result.rows);  // Devuelve los datos de los ángeles
+    });
+});
+
+
 // Añadir Experimento
 app.post("/agregarExperimento", (req, res) => {
     if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
@@ -254,6 +270,21 @@ app.post("/editarExperimento", (req, res) => {
             enviarAlerta(res, "Experimento editado exitosamente");
         }
     );
+});
+
+// Obtener y mostrar los experimentos
+app.get("/obtenerExperimentos", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ mensaje: "No autorizado" });  // Verifica si el usuario está autenticado
+    }
+
+    pool.query("SELECT * FROM experimentos", (err, result) => {
+        if (err) {
+            console.error("Error al obtener experimentos:", err);
+            return res.status(500).json({ mensaje: "Error al obtener experimentos" });
+        }
+        res.json(result.rows);  // Devuelve los datos de los experimentos
+    });
 });
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
