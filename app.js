@@ -249,7 +249,7 @@ app.get("/verAngeles", (req, res) => {
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link rel="stylesheet" href="/styles.css">
             </head>
-            <body class="min-vh-100">
+            <body class="index-body"> <!-- Aquí asignamos la clase index-body -->
                 <div class="container text-center">
                     <h2 class="glitch">Lista de Ángeles Registrados</h2>
                     ${tablaAngeles}
@@ -296,6 +296,73 @@ app.get("/editarAngel/:id", (req, res) => {
     });
 });
 
+// Ruta para editar un ángel (solo admins)
+app.get("/editarAngel/:id", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
+    }
+
+    const { id } = req.params;
+    pool.query("SELECT * FROM angeles WHERE id = $1", [id], (err, result) => {
+        if (err) {
+            console.error("Error al obtener ángel:", err);
+            return res.status(500).send("Error al obtener ángel");
+        }
+        if (result.rows.length === 0) {
+            return res.status(404).send("Ángel no encontrado");
+        }
+
+        const angel = result.rows[0];
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Editar Ángel</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="index-body">
+                <div class="container text-center">
+                    <h2 class="glitch">Editar Ángel</h2>
+                    <form action="/editarAngel" method="POST">
+                        <input type="hidden" name="id" value="${angel.id}">
+                        
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="${angel.nombre}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="codigo" class="form-label">Código</label>
+                            <input type="text" class="form-control" id="codigo" name="codigo" value="${angel.codigo}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="jerarquia" class="form-label">Jerarquía</label>
+                            <input type="text" class="form-control" id="jerarquia" name="jerarquia" value="${angel.jerarquia}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="captura" class="form-label">Captura</label>
+                            <textarea class="form-control" id="captura" name="captura" required>${angel.captura}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <input type="text" class="form-control" id="estado" name="estado" value="${angel.estado}" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-glitch w-100">Actualizar Ángel</button>
+                    </form>
+                </div>
+            </body>
+            </html>
+        `);
+    });
+});
+
 // Ruta para actualizar los datos del ángel (solo admins)
 app.post("/editarAngel", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
@@ -311,7 +378,7 @@ app.post("/editarAngel", (req, res) => {
                 console.error("Error al editar ángel:", err);
                 return res.status(500).send("Error al editar ángel");
             }
-            res.redirect("/verAngeles");
+            res.redirect("/verAngeles");  // Redirige a la lista de ángeles después de la actualización
         }
     );
 });
