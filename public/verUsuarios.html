@@ -22,18 +22,7 @@
                 </tr>
             </thead>
             <tbody id="usersTableBody">
-                <!-- Los usuarios se renderizan aquí desde el backend -->
-                <% users.forEach(user => { %>
-                    <tr>
-                        <td><%= user.id %></td>
-                        <td><%= user.username %></td>
-                        <td><%= user.rol %></td>
-                        <td>
-                            <button class="btn btn-warning">Editar</button>
-                            <button class="btn btn-danger">Eliminar</button>
-                        </td>
-                    </tr>
-                <% }); %>
+                <!-- Aquí se llenarán los usuarios con JS -->
             </tbody>
         </table>
 
