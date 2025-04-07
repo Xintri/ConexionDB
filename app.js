@@ -168,6 +168,7 @@ app.get("/logout", (req, res) => {
 
 // ---- Rutas para usuarios normales y admins ----
 
+
 // Añadir Ángel
 app.post("/agregarAngel", (req, res) => {
     if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
@@ -190,28 +191,6 @@ app.post("/agregarAngel", (req, res) => {
     );
 });
 
-// Editar Ángel
-app.post("/editarAngel", (req, res) => {
-    if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
-
-    const { id, nombre, codigo, jerarquia, captura, estado } = req.body;
-    if (!id || !nombre || !codigo || !jerarquia || !captura || !estado) {
-        return enviarAlerta(res, "Faltan datos para editar ángel", false);
-    }
-
-    pool.query(
-        "UPDATE angeles SET nombre = $1, codigo = $2, jerarquia = $3, captura = $4, estado = $5 WHERE id = $6",
-        [sanitize(nombre), sanitize(codigo), sanitize(jerarquia), sanitize(captura), sanitize(estado), id],
-        (err) => {
-            if (err) {
-                console.error("Error al editar ángel:", err);
-                return enviarAlerta(res, "Error al editar ángel", false);
-            }
-            enviarAlerta(res, "Ángel editado exitosamente");
-        }
-    );
-});
-
 // Obtener y mostrar los ángeles
 app.get("/obtenerAngeles", (req, res) => {
     if (!req.session.user) {
@@ -220,25 +199,69 @@ app.get("/obtenerAngeles", (req, res) => {
 
     pool.query("SELECT * FROM angeles", (err, result) => {
         if (err) {
-            console.error("Error al obtener angeles:", err);
-            return res.status(500).json({ mensaje: "Error al obtener angeles" });
-        }
-        res.json(result.rows);  // Devuelve los datos de los angeles
-    });
-});
-
-// Ruta para ver la lista de ángeles
-app.get("/verAngeles", (req, res) => {
-    if (!req.session.user) {
-        return res.redirect("/login.html"); // Redirigir al login si no está autenticado
-    }
-
-    pool.query("SELECT * FROM angeles", (err, result) => {
-        if (err) {
-            console.error("Error al obtener ángeles:", err);
+            console.error("❌ Error al obtener ángeles:", err);
             return res.status(500).send("Error al obtener ángeles");
         }
-        res.sendFile(path.join(__dirname, "public", "verAngeles.html"));  // Asegúrate que la ruta sea correcta
+
+        // 🔥 Usar result.rows para generar la tabla dinámica
+        let tablaAngeles = `
+            <table class="table table-dark table-bordered table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Código</th>
+                        <th>Jerarquía</th>
+                        <th>Captura</th>
+                        <th>Estado</th>
+                        <th>Fecha de Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        result.rows.forEach(angel => {
+            tablaAngeles += `
+                <tr>
+                    <td>${angel.id}</td>
+                    <td>${angel.nombre}</td>
+                    <td>${angel.codigo}</td>
+                    <td>${angel.jerarquia}</td>
+                    <td>${angel.captura}</td>
+                    <td>${angel.estado}</td>
+                    <td>${angel.fecha_registro}</td>
+                    <td>
+                        <a href="/editarAngel/${angel.id}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="/eliminarAngel/${angel.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>`;
+        });
+
+        tablaAngeles += `</tbody></table>`;
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Ángeles Registrados</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="min-vh-100">
+                <div class="container text-center">
+                    <h2 class="glitch">Lista de Ángeles Registrados</h2>
+                    ${tablaAngeles}
+                    <div class="mt-4">
+                        <a href="/">
+                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
+                        </a>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
     });
 });
 
@@ -297,27 +320,6 @@ app.post("/agregarExperimento", (req, res) => {
     );
 });
 
-// Editar Experimento
-app.post("/editarExperimento", (req, res) => {
-    if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
-
-    const { id, numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
-    if (!id || !numero_experimento || !tipo_experimento || !descripcion || !resultado) {
-        return enviarAlerta(res, "Faltan datos para editar experimento", false);
-    }
-
-    pool.query(
-        "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
-        [numero_experimento, sanitize(tipo_experimento), sanitize(descripcion), sanitize(resultado), id],
-        (err) => {
-            if (err) {
-                console.error("Error al editar experimento:", err);
-                return enviarAlerta(res, "Error al editar experimento", false);
-            }
-            enviarAlerta(res, "Experimento editado exitosamente");
-        }
-    );
-});
 
 // Obtener y mostrar los experimentos
 app.get("/obtenerExperimentos", (req, res) => {
@@ -327,25 +329,63 @@ app.get("/obtenerExperimentos", (req, res) => {
 
     pool.query("SELECT * FROM experimentos", (err, result) => {
         if (err) {
-            console.error("Error al obtener experimentos:", err);
-            return res.status(500).json({ mensaje: "Error al obtener experimentos" });
-        }
-        res.json(result.rows);  // Devuelve los datos de los experimentos
-    });
-});
-
-// Ruta para ver la lista de experimentos
-app.get("/verExperimentos", (req, res) => {
-    if (!req.session.user) {
-        return res.redirect("/login.html"); // Redirigir al login si no está autenticado
-    }
-
-    pool.query("SELECT * FROM experimentos", (err, result) => {
-        if (err) {
-            console.error("Error al obtener experimentos:", err);
+            console.error("❌ Error al obtener experimentos:", err);
             return res.status(500).send("Error al obtener experimentos");
         }
-        res.sendFile(path.join(__dirname, "public", "verExperimentos.html")); // Asegúrate que la ruta sea correcta
+
+        // 🔥 Usar result.rows para generar la tabla dinámica
+        let tablaExperimentos = `
+            <table class="table table-dark table-bordered table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Resultado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        result.rows.forEach(experiment => {
+            tablaExperimentos += `
+                <tr>
+                    <td>${experiment.numero_experimento}</td>
+                    <td>${experiment.tipo_experimento}</td>
+                    <td>${experiment.descripcion}</td>
+                    <td>${experiment.resultado}</td>
+                    <td>
+                        <a href="/editarExperimento/${experiment.id}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="/eliminarExperimento/${experiment.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>`;
+        });
+
+        tablaExperimentos += `</tbody></table>`;
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Experimentos Registrados</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="min-vh-100">
+                <div class="container text-center">
+                    <h2 class="glitch">Lista de Experimentos Registrados</h2>
+                    ${tablaExperimentos}
+                    <div class="mt-4">
+                        <a href="/">
+                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
+                        </a>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
     });
 });
 
@@ -388,7 +428,7 @@ app.post("/eliminarExperimento", (req, res) => {
 // Obtener usuarios (para mostrar en la tabla)
 app.get("/obtenerUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");
+        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
     }
 
     pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
@@ -396,18 +436,58 @@ app.get("/obtenerUsuarios", (req, res) => {
             console.error("Error al obtener usuarios:", err);
             return res.status(500).json({ mensaje: "Error al obtener usuarios" });
         }
-        res.json(result.rows);  // Devuelve los datos de los usuarios
+
+        let tablaUsuarios = `
+            <table class="table table-bordered table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre de Usuario</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        result.rows.forEach(user => {
+            tablaUsuarios += `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.rol}</td>
+                    <td>
+                        <a href="/editarUsuario/${user.id}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="/eliminarUsuario/${user.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>`;
+        });
+
+        tablaUsuarios += `</tbody></table>`;
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Usuarios Registrados</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="min-vh-100">
+                <div class="container text-center">
+                    <h2 class="glitch">Lista de Usuarios Registrados</h2>
+                    ${tablaUsuarios}
+                    <div class="mt-4">
+                        <a href="/">
+                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
+                        </a>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
     });
-});
-
-// Ruta para ver la lista de usuarios (solo admins)
-app.get("/verUsuarios", (req, res) => {
-    if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
-    }
-
-    // Servir el archivo HTML estático
-    res.sendFile(path.join(__dirname, "public", "verUsuarios.html"));
 });
 
 // Editar Usuario (solo admins)
