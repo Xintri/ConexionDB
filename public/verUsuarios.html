@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuarios Registrados</title>
     <link rel="stylesheet" href="/usuarios.css">
-
 </head>
 <body class="index-body">
     <div class="index-container text-center">
@@ -23,7 +22,18 @@
                 </tr>
             </thead>
             <tbody id="usersTableBody">
-                <!-- Los usuarios serán agregados aquí dinámicamente -->
+                <!-- Los usuarios se renderizan aquí desde el backend -->
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= user.id %></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.rol %></td>
+                        <td>
+                            <button class="btn btn-warning">Editar</button>
+                            <button class="btn btn-danger">Eliminar</button>
+                        </td>
+                    </tr>
+                <% }); %>
             </tbody>
         </table>
 

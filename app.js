@@ -400,12 +400,22 @@ app.get("/obtenerUsuarios", (req, res) => {
     });
 });
 
-// Ver la lista de usuarios (solo admins)
+// Ruta para ver la lista de usuarios (solo admins)
 app.get("/verUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html"); // Redirigir al login si no está autenticado o no es admin
+        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
     }
-    res.sendFile(path.join(__dirname, "public", "verUsuarios.html")); // Asegúrate que la ruta sea correcta
+
+    // Obtener los usuarios
+    pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
+        if (err) {
+            console.error("Error al obtener usuarios:", err);
+            return res.status(500).send("Error al obtener usuarios");
+        }
+        
+        // Pasar los datos de los usuarios al HTML
+        res.render("verUsuarios", { users: result.rows });  // Pasa los usuarios a la vista
+    });
 });
 
 // Editar Usuario (solo admins)
