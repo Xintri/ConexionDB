@@ -50,7 +50,7 @@ app.get("/", (req, res) => {
         res.sendFile(path.join(__dirname, "public", "index.html"));
     } else {
         // Si el usuario no está autenticado, redirigir al login
-        res.redirect("/login.html");  // Aquí usamos `redirect` para redirigir correctamente
+        res.sendFile(path.join(__dirname, "public", "login.html"));
     }
 });
 
@@ -84,29 +84,38 @@ app.get("/session", (req, res) => {
 app.post("/register", (req, res) => {
     const { username, password, admin_key } = req.body;
 
+    // Verificar que los campos esenciales están presentes
     if (!username || !password) {
         return enviarAlerta(res, "Faltan datos en el registro", false);
     }
 
+    // Validar que los datos no contienen palabras o caracteres peligrosos
     if (!validarInput(username) || !validarInput(password)) {
         return enviarAlerta(res, "Datos inválidos", false);
     }
 
-    const rol = (admin_key === process.env.ADMIN_KEY) ? "admin" : "user";
+    // Asignar rol dependiendo de la clave admin_key
+    const rol = (admin_key === process.env.ADMIN_KEY) ? "admin" : "user"; // Verificar si es admin o usuario
 
+    // Insertar usuario en la base de datos
     pool.query(
         "INSERT INTO usuarios (username, password, rol) VALUES ($1, $2, $3)",
-        [sanitize(username), sanitize(password), rol],
+        [sanitize(username), sanitize(password), rol], // Sanitize inputs
         (err) => {
             if (err) {
                 console.error("Error al registrar:", err);
                 return enviarAlerta(res, "Error al registrar usuario", false);
             }
-            req.session.user = { username, rol };
+
+            // Asignar la sesión para el usuario registrado
+            req.session.user = { username, rol };  // Asignar la sesión con el rol correspondiente
+
+            // Enviar alerta de registro exitoso
             enviarAlerta(res, "Registro exitoso");
         }
     );
 });
+
 
 // Login
 app.post("/login", (req, res) => {
@@ -146,7 +155,6 @@ app.post("/login", (req, res) => {
     );
 });
 
-// Logout
 // Logout
 app.get("/logout", (req, res) => {
     req.session.destroy((err) => {

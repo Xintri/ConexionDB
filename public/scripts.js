@@ -9,11 +9,20 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.loggedIn && window.location.pathname === '/login.html') {
                 window.location.href = '/';  // Redirigir a index.html si ya está autenticado
             }
+
+            // Mostrar u ocultar la sección de usuarios dependiendo del rol
+            const usersSection = document.getElementById('usersSection');
+            if (usersSection) {
+                if (data.rol === 'admin') {
+                    usersSection.style.display = 'block';  // Mostrar sección si es admin
+                } else {
+                    usersSection.style.display = 'none';  // Ocultar sección si no es admin
+                }
+            }
         })
         .catch(error => {
             console.error('Error al verificar la sesión:', error);
         });
-
 
     // Obtener y mostrar los ángeles
     fetch('/obtenerAngeles')
