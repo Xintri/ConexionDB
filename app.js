@@ -427,7 +427,9 @@ app.get("/verExperimentos", (req, res) => {
                 <td>${experiment.resultado}</td>
                 <td>
                     <a href="/editarExperimento/${experiment.id}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="/eliminarExperimento/${experiment.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <form action="/eliminarExperimento/${experiment.id}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
                 </td>
             </tr>`;
         });
@@ -444,7 +446,7 @@ app.get("/verExperimentos", (req, res) => {
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link rel="stylesheet" href="/styles.css">
             </head>
-            <body class="min-vh-100">
+            <body class="index-body">
                 <div class="container text-center">
                     <h2 class="glitch">Lista de Experimentos Registrados</h2>
                     ${tablaExperimentos}
@@ -477,14 +479,46 @@ app.get("/editarExperimento/:id", (req, res) => {
         }
         const experiment = result.rows[0];
         res.send(`
-            <form action="/editarExperimento" method="POST">
-                <input type="hidden" name="id" value="${experiment.id}">
-                <input type="text" name="numero_experimento" value="${experiment.numero_experimento}">
-                <input type="text" name="tipo_experimento" value="${experiment.tipo_experimento}">
-                <textarea name="descripcion">${experiment.descripcion}</textarea>
-                <textarea name="resultado">${experiment.resultado}</textarea>
-                <button type="submit">Actualizar Experimento</button>
-            </form>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Editar Experimento</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="index-body">
+                <div class="container text-center">
+                    <h2 class="glitch">Editar Experimento</h2>
+                    <form action="/editarExperimento" method="POST">
+                        <input type="hidden" name="id" value="${experiment.id}">
+
+                        <div class="mb-3">
+                            <label for="numero_experimento" class="form-label">Número de Experimento</label>
+                            <input type="text" class="form-control" id="numero_experimento" name="numero_experimento" value="${experiment.numero_experimento}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tipo_experimento" class="form-label">Tipo de Experimento</label>
+                            <input type="text" class="form-control" id="tipo_experimento" name="tipo_experimento" value="${experiment.tipo_experimento}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" required>${experiment.descripcion}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="resultado" class="form-label">Resultado</label>
+                            <textarea class="form-control" id="resultado" name="resultado" required>${experiment.resultado}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-glitch w-100">Actualizar Experimento</button>
+                    </form>
+                </div>
+            </body>
+            </html>
         `);
     });
 });
