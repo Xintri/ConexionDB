@@ -8,8 +8,9 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: start;
+    align-items: center;  /* Centrado vertical y horizontal */
     padding: 20px;
+    visibility: hidden;  /* Ocultar hasta que todo esté listo */
 }
 
 /* 🔥 Contenedor principal */
@@ -164,4 +165,21 @@ button:hover, .btn-glitch:hover {
 
 .btn-danger:hover {
     background-color: #c0392b;
+}
+
+/* 🔥 Loader - Animación mientras se carga */
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #ff0000; /* Red color */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin: 50px auto;
+}
+
+/* Animación de giro */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
