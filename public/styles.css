@@ -1,15 +1,39 @@
-/* Estilo general para el cuerpo */
+/* 🔥 Estilo general */
 body {
     background-color: #0a0a0a;
-    color: #b3b3b3;
+    color: #d1d1d1;
     font-family: 'Courier New', Courier, monospace;
     text-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
     overflow-x: hidden;
-    overflow-y: auto;
-    height: auto;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    padding: 20px;
 }
 
-/* Animación glitch */
+/* 🔥 Contenedor principal */
+.container {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(20, 20, 20, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    border: 1px solid rgba(255, 0, 0, 0.4);
+    margin-top: 40px;
+}
+
+/* 🔥 Títulos */
+h1, h2 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(255, 0, 0, 0.5);
+    padding-bottom: 10px;
+}
+
+/* 🔥 Glitch Animation */
 .glitch {
     animation: glitch 1.5s infinite;
 }
@@ -20,54 +44,18 @@ body {
     100% { text-shadow: 2px 2px red, -2px -2px blue; }
 }
 
-/* Contenedor para los formularios */
-.container {
-    max-width: 100%;
-    background: rgba(20, 20, 20, 0.9);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-    border: 1px solid rgba(255, 0, 0, 0.3);
-    overflow: hidden;
-    margin-top: 20px;
+/* 🔥 Formulario */
+form {
+    margin-bottom: 30px;
 }
 
-/* Títulos */
-h2 {
-    font-size: 1.8rem;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    padding: 10px 0;
-    border-bottom: 2px solid rgba(255, 0, 0, 0.5);
-}
-
-/* Estilos para los botones */
-.btn-glitch {
-    background: linear-gradient(90deg, #ff0000, #990000);
-    border: none;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    width: 100%;
-    transition: all 0.3s ease-in-out;
-}
-
-.btn-glitch:hover {
-    background: linear-gradient(90deg, #990000, #ff0000);
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-    transform: scale(1.05);
-}
-
-/* Campos de entrada */
 input, select, textarea {
-    background-color: black;
-    color: white;
-    border: 1px solid #990000;
-    padding: 8px;
-    border-radius: 5px;
+    background-color: #111;
+    color: #f1f1f1;
+    border: 1px solid #ff0000;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
     width: 100%;
 }
 
@@ -77,76 +65,90 @@ input::placeholder, textarea::placeholder {
 
 textarea {
     resize: none;
-    height: 100px;
+    height: 120px;
 }
 
-/* Estilo para los mensajes de alerta */
-.alert-hack {
-    color: red;
-    text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
-    text-align: center;
+/* 🔥 Botones */
+button, .btn-glitch {
+    background: linear-gradient(90deg, #ff0000, #990000);
+    border: none;
+    padding: 10px 20px;
+    color: white;
     font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    border-radius: 8px;
+    width: 100%;
+    transition: all 0.3s ease;
 }
 
-/* Contenedor de las tablas */
+button:hover, .btn-glitch:hover {
+    background: linear-gradient(90deg, #990000, #ff0000);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+    transform: scale(1.05);
+}
+
+/* 🔥 Mensajes de alerta */
+.alert-hack {
+    color: #ff4d4d;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+/* 🔥 Tablas */
 .table-container {
     overflow-x: auto;
 }
 
-/* Estilos para la tabla */
 .table {
     width: 100%;
-    background: rgba(20, 20, 20, 0.8);
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
-    table-layout: fixed;
-    word-wrap: break-word;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: rgba(20, 20, 20, 0.9);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-/* Estilos para las cabeceras */
-.table th {
-    background-color: #990000;
-    color: white;
-}
-
-/* Estilos para las celdas */
-.table td {
-    background-color: rgba(20, 20, 20, 0.9);
+.table th, .table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+    text-align: center;
     color: #ddd;
 }
 
-/* Alineación de las celdas */
-.table th, .table td {
-    text-align: center;
-    vertical-align: middle;
-    padding: 10px;
+.table th {
+    background-color: #ff0000;
+    color: white;
+    font-weight: bold;
 }
 
-/* Ajustes especiales para la columna de 'Captura' */
+.table td {
+    background-color: rgba(20, 20, 20, 0.8);
+}
+
+/* Ajuste especial para captura */
 .table th:nth-child(5), .table td:nth-child(5) {
-    width: 35%;
-    word-wrap: break-word;
-    white-space: normal;
+    width: 30%;
 }
 
-/* Hover en filas de tabla */
+/* Hover en tabla */
 .table tr:hover {
     background-color: rgba(255, 0, 0, 0.2);
-    cursor: pointer;
 }
 
-/* Estilos para los botones dentro de la tabla */
-.table td a.btn {
-    font-size: 1rem;
-    padding: 8px 12px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+/* Botones dentro de tabla */
+.table a.btn {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+    margin: 2px;
     display: inline-block;
 }
 
-/* Estilos para los botones de 'Editar' y 'Eliminar' */
+/* Estilo para botones específicos */
 .btn-warning {
     background-color: #f39c12;
+    border: none;
     color: white;
 }
 
@@ -156,6 +158,7 @@ textarea {
 
 .btn-danger {
     background-color: #e74c3c;
+    border: none;
     color: white;
 }
 
