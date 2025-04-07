@@ -213,17 +213,17 @@ app.post("/editarAngel", (req, res) => {
 });
 
 // Obtener y mostrar los ángeles
-app.get("/obtenerAngeles", (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ mensaje: "No autorizado" });
+app.get("/obtenerUsuarios", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return enviarAlerta(res, "Acceso denegado", false); // Acceso denegado si no es admin
     }
 
-    pool.query("SELECT * FROM angeles", (err, result) => {
+    pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
         if (err) {
-            console.error("Error al obtener ángeles:", err);
-            return res.status(500).json({ mensaje: "Error al obtener ángeles" });
+            console.error("Error al obtener usuarios:", err);
+            return enviarAlerta(res, "Error al obtener usuarios", false);
         }
-        res.json(result.rows);  // Devuelve los datos de los ángeles
+        res.json(result.rows);  // Devolver los datos de los usuarios
     });
 });
 
@@ -238,7 +238,8 @@ app.get("/verAngeles", (req, res) => {
             console.error("Error al obtener ángeles:", err);
             return res.status(500).send("Error al obtener ángeles");
         }
-        res.render("verAngeles", { angeles: result.rows });  // Mostrar ángeles en una tabla
+        // Renderizar la página con los datos de los ángeles
+        res.render("verAngeles", { angeles: result.rows });  
     });
 });
 
@@ -274,8 +275,6 @@ app.post("/eliminarAngel", (req, res) => {
         res.redirect("/verAngeles");
     });
 });
-
-
 
 // Añadir Experimento
 app.post("/agregarExperimento", (req, res) => {
