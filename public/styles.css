@@ -174,12 +174,14 @@ button:hover, .btn-glitch:hover {
     transform: scale(1.05); /* Aumenta ligeramente el tamaño del botón al pasar el cursor */
 }
 
-/* Botones dentro de tabla */
+/* 🔥 Botones dentro de tabla */
 .table a.btn {
-    padding: 6px 10px;
-    font-size: 0.9rem;
-    margin: 2px;
+    padding: 10px 15px;  /* Aseguramos un tamaño consistente en todos los botones */
+    font-size: 1rem; /* Tamaño de fuente consistente */
+    margin: 5px; /* Un pequeño margen entre los botones */
     display: inline-block;
+    border-radius: 8px; /* Bordes redondeados para que se vean más estéticos */
+    text-align: center; /* Centrar el texto dentro del botón */
 }
 
 /* 🔥 Botones específicos */
@@ -187,6 +189,20 @@ button:hover, .btn-glitch:hover {
     background-color: #f39c12;
     border: none;
     color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
 }
 
 .btn-warning:hover {
