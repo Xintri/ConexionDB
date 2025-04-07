@@ -1,5 +1,5 @@
-/* 🔥 Estilo general */
-body {
+/* 🔥 Estilo general para index.html */
+.index-body {
     background-color: #0a0a0a;
     color: #d1d1d1;
     font-family: 'Courier New', Courier, monospace;
@@ -13,10 +13,36 @@ body {
     visibility: hidden;  /* Ocultar hasta que todo esté listo */
 }
 
-/* 🔥 Contenedor principal */
-.container {
+/* 🔥 Estilo general para login.html */
+.login-body {
+    background-color: #121212;
+    color: #d1d1d1;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* 🔥 Contenedor principal para index.html */
+.index-container {
     width: 100%;
     max-width: 900px;
+    background: rgba(20, 20, 20, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    border: 1px solid rgba(255, 0, 0, 0.4);
+    margin-top: 40px;
+}
+
+/* 🔥 Contenedor principal para login.html */
+.login-container {
+    width: 100%;
+    max-width: 500px;
     background: rgba(20, 20, 20, 0.95);
     padding: 30px;
     border-radius: 12px;
