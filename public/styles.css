@@ -1,9 +1,9 @@
 /* 🔥 Estilo general para index.html */
 .index-body {
-    background-color: #0a0a0a;
-    color: #d1d1d1;
-    font-family: Arial, sans-serif; /* Cambié a fuente más estándar */
-    text-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+    background-color: #0a0a0a; /* Fondo oscuro */
+    color: #d1d1d1; /* Texto claro */
+    font-family: Arial, sans-serif; /* Fuente estándar */
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.2); /* Sombra sutil para el texto */
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
@@ -40,19 +40,6 @@
     margin-top: 40px;
 }
 
-/* 🔥 Contenedor principal para login.html */
-.login-container {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;   /* Centramos el contenedor */
-    background: rgba(20, 20, 20, 0.95);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-    border: 1px solid rgba(255, 0, 0, 0.4);
-    margin-top: 40px;
-}
-
 /* 🔥 Títulos */
 h1, h2 {
     font-size: 2rem;
@@ -65,6 +52,11 @@ h1, h2 {
 /* 🔥 Glitch Animation */
 .glitch {
     animation: glitch 1s infinite;  /* Reducido la duración de la animación */
+    font-size: 2.5rem; /* Aumentar tamaño de fuente */
+    color: #ff0000; /* Color rojo para el texto */
+    text-align: center; /* Centrar el título */
+    margin-bottom: 20px; /* Espacio debajo del título */
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5), 0 0 20px rgba(255, 0, 0, 0.3); /* Sombra para el efecto glitch */
 }
 
 @keyframes glitch {
@@ -76,25 +68,30 @@ h1, h2 {
 /* 🔥 Formulario */
 form {
     margin-bottom: 30px;
+    max-width: 600px; /* Limitar el tamaño del formulario */
+    margin: 0 auto; /* Centrar el formulario */
+    padding: 20px; /* Añadir padding para que no esté tan pegado al borde */
+    background-color: rgba(20, 20, 20, 0.9); /* Fondo para el formulario */
+    border-radius: 12px; /* Bordes redondeados */
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); /* Sombra para resaltar el formulario */
 }
 
+/* Estilos para inputs, selects y textareas */
 input, select, textarea {
     background-color: #111;
     color: #f1f1f1;
     border: 1px solid #ff0000;
-    padding: 12px; /* Aumentado el padding */
+    padding: 12px; /* Mayor padding */
     margin-bottom: 15px;
     border-radius: 8px;
-    width: 100%;
+    width: 100%; /* Aseguramos que los campos ocupen el 100% del ancho disponible */
 }
 
-input::placeholder, textarea::placeholder {
-    color: rgba(255, 0, 0, 0.5);
-}
-
-textarea {
-    resize: none;
-    height: 120px;
+/* Estilos para inputs y textareas al hacer foco */
+input:focus, textarea:focus {
+    border-color: #ff6600; /* Cambiar color de borde al hacer foco */
+    outline: none; /* Eliminar el contorno por defecto */
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Sombra para resaltar el campo */
 }
 
 /* 🔥 botones */
@@ -107,16 +104,18 @@ button, .btn-glitch {
     font-size: 1.2rem;
     text-transform: uppercase;
     border-radius: 8px;
-    width: 100%;  /* Aseguramos que ocupen el 100% del ancho disponible */
+    width: 100%; /* Aseguramos que los botones ocupen el 100% del ancho disponible */
     transition: all 0.3s ease;
     display: inline-block;
     visibility: visible;
     box-sizing: border-box;
+}
 
+/* Ajustes de color en los botones */
 button:hover, .btn-glitch:hover {
     background: linear-gradient(90deg, #990000, #ff0000);
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
-    transform: scale(1.05);
+    transform: scale(1.05); /* Un pequeño efecto de expansión al pasar el ratón */
 }
 
 /* 🔥 Mensajes de alerta */
@@ -233,6 +232,4 @@ button:hover, .btn-glitch:hover {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
 }
