@@ -587,7 +587,7 @@ app.post("/agregarUsuario", (req, res) => {
     );
 });
 
-// Obtener y mostrar los usuarios
+// Obtener y mostrar los usuarios (solo admins)
 app.get("/verUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
         return res.redirect("/login.html"); // Redirigir al login si no está autenticado o no es admin
@@ -619,7 +619,9 @@ app.get("/verUsuarios", (req, res) => {
                 <td>${user.rol}</td>
                 <td>
                     <a href="/editarUsuario/${user.id}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="/eliminarUsuario/${user.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <form action="/eliminarUsuario/${user.id}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
                 </td>
             </tr>`;
         });
@@ -636,7 +638,7 @@ app.get("/verUsuarios", (req, res) => {
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link rel="stylesheet" href="/styles.css">
             </head>
-            <body class="min-vh-100">
+            <body class="index-body">
                 <div class="container text-center">
                     <h2 class="glitch">Lista de Usuarios Registrados</h2>
                     ${tablaUsuarios}
@@ -669,15 +671,39 @@ app.get("/editarUsuario/:id", (req, res) => {
         }
         const user = result.rows[0];
         res.send(`
-            <form action="/editarUsuario" method="POST">
-                <input type="hidden" name="id" value="${user.id}">
-                <input type="text" name="username" value="${user.username}">
-                <select name="rol">
-                    <option value="admin" ${user.rol === "admin" ? "selected" : ""}>Admin</option>
-                    <option value="user" ${user.rol === "user" ? "selected" : ""}>User</option>
-                </select>
-                <button type="submit">Actualizar Usuario</button>
-            </form>
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Editar Usuario</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="index-body">
+                <div class="container text-center">
+                    <h2 class="glitch">Editar Usuario</h2>
+                    <form action="/editarUsuario" method="POST">
+                        <input type="hidden" name="id" value="${user.id}">
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="username" name="username" value="${user.username}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="rol" class="form-label">Rol</label>
+                            <select name="rol" class="form-control" required>
+                                <option value="admin" ${user.rol === "admin" ? "selected" : ""}>Admin</option>
+                                <option value="user" ${user.rol === "user" ? "selected" : ""}>User</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-glitch w-100">Actualizar Usuario</button>
+                    </form>
+                </div>
+            </body>
+            </html>
         `);
     });
 });
