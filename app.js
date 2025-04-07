@@ -587,7 +587,7 @@ app.post("/agregarUsuario", (req, res) => {
     );
 });
 
-// Obtener y mostrar los usuarios (solo admins)
+// Ruta para obtener y mostrar los usuarios (solo admins)
 app.get("/verUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
         return res.redirect("/login.html"); // Redirigir al login si no está autenticado o no es admin
