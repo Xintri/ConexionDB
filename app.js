@@ -46,10 +46,8 @@ function enviarAlerta(res, mensaje, exito = true) {
 // Mostrar la página de login o index
 app.get("/", (req, res) => {
     if (req.session.user) {
-        // Si el usuario está autenticado, mostrar el index
         res.sendFile(path.join(__dirname, "public", "index.html"));
     } else {
-        // Si el usuario no está autenticado, redirigir al login
         res.sendFile(path.join(__dirname, "public", "login.html"));
     }
 });
@@ -68,7 +66,6 @@ app.get("/session", (req, res) => {
 });
 
 // Registro
-// Registro
 app.post("/register", (req, res) => {
     const { username, password, admin_key } = req.body;
 
@@ -80,8 +77,7 @@ app.post("/register", (req, res) => {
         return enviarAlerta(res, "Datos inválidos", false);
     }
 
-    // Compara admin_key con la clave en el archivo .env
-    const rol = (admin_key === process.env.ADMIN_KEY) ? "admin" : "user";  // Si la clave es correcta, el rol es "admin"
+    const rol = (admin_key === process.env.ADMIN_KEY) ? "admin" : "user";
 
     pool.query(
         "INSERT INTO usuarios (username, password, rol) VALUES ($1, $2, $3)",
@@ -91,7 +87,7 @@ app.post("/register", (req, res) => {
                 console.error("Error al registrar:", err);
                 return enviarAlerta(res, "Error al registrar usuario", false);
             }
-            req.session.user = { username, rol };  // Asigna el rol correcto al usuario en sesión
+            req.session.user = { username, rol };
             enviarAlerta(res, "Registro exitoso");
         }
     );
@@ -138,7 +134,7 @@ app.post("/login", (req, res) => {
 // Logout
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
-        res.redirect("/login.html");  // Redirigir al login después de cerrar sesión
+        res.redirect("/login.html");
     });
 });
 
@@ -180,8 +176,8 @@ app.post("/editarAngel", (req, res) => {
         [sanitize(nombre), sanitize(codigo), sanitize(jerarquia), sanitize(captura), sanitize(estado), id],
         (err) => {
             if (err) {
-            console.error("Error al editar ángel:", err);
-            return enviarAlerta(res, "Error al editar ángel", false);
+                console.error("Error al editar ángel:", err);
+                return enviarAlerta(res, "Error al editar ángel", false);
             }
             enviarAlerta(res, "Ángel editado exitosamente");
         }
@@ -192,21 +188,21 @@ app.post("/editarAngel", (req, res) => {
 app.post("/agregarExperimento", (req, res) => {
     if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
 
-const { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
+    const { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
     if (!numero_experimento || !tipo_experimento || !descripcion || !resultado) {
         return enviarAlerta(res, "Faltan datos para registrar experimento", false);
-}
-
-pool.query(
-    "INSERT INTO experimentos (numero_experimento, tipo_experimento, descripcion, resultado) VALUES ($1, $2, $3, $4)",
-    [numero_experimento, sanitize(tipo_experimento), sanitize(descripcion), sanitize(resultado)],
-    (err) => {
-        if (err) {
-            console.error("Error al agregar experimento:", err);
-            return enviarAlerta(res, "Error al registrar experimento", false);
-        }
-        enviarAlerta(res, "Experimento registrado exitosamente");
     }
+
+    pool.query(
+        "INSERT INTO experimentos (numero_experimento, tipo_experimento, descripcion, resultado) VALUES ($1, $2, $3, $4)",
+        [numero_experimento, sanitize(tipo_experimento), sanitize(descripcion), sanitize(resultado)],
+        (err) => {
+            if (err) {
+                console.error("Error al agregar experimento:", err);
+                return enviarAlerta(res, "Error al registrar experimento", false);
+            }
+            enviarAlerta(res, "Experimento registrado exitosamente");
+        }
     );
 });
 
@@ -223,39 +219,13 @@ app.post("/editarExperimento", (req, res) => {
         "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
         [numero_experimento, sanitize(tipo_experimento), sanitize(descripcion), sanitize(resultado), id],
         (err) => {
-        if (err) {
-            console.error("Error al editar experimento:", err);
-            return enviarAlerta(res, "Error al editar experimento", false);
-        }
-        enviarAlerta(res, "Experimento editado exitosamente");
+            if (err) {
+                console.error("Error al editar experimento:", err);
+                return enviarAlerta(res, "Error al editar experimento", false);
+            }
+            enviarAlerta(res, "Experimento editado exitosamente");
         }
     );
-    });
-
-// Ver Ángeles
-app.get("/obtenerAngeles", (req, res) => {
-    if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
-
-  pool.query("SELECT * FROM angeles", (err, result) => {
-    if (err) {
-        console.error("Error al obtener ángeles:", err);
-        return enviarAlerta(res, "Error al obtener ángeles", false);
-    }
-    res.json(result.rows);
-    });
-});
-
-// Ver Experimentos
-app.get("/obtenerExperimentos", (req, res) => {
-    if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
-
-  pool.query("SELECT * FROM experimentos", (err, result) => {
-    if (err) {
-        console.error("Error al obtener experimentos:", err);
-        return enviarAlerta(res, "Error al obtener experimentos", false);
-    }
-    res.json(result.rows);
-});
 });
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
@@ -275,51 +245,51 @@ app.get("/obtenerUsuarios", (req, res) => {
     });
 });
 
-// Editar Usuarios (solo admins)
+// Editar Usuario (solo admins)
 app.post("/editarUsuario", (req, res) => {
-if (!req.session.user || req.session.user.rol !== "admin") {
-    return enviarAlerta(res, "Acceso denegado", false);
-}
-
-const { id, username, rol } = req.body;
-if (!id || !username || !rol) {
-    return enviarAlerta(res, "Faltan datos para editar usuario", false);
-}
-
-pool.query(
-    "UPDATE usuarios SET username = $1, rol = $2 WHERE id = $3",
-    [sanitize(username), sanitize(rol), id],
-    (err) => {
-        if (err) {
-        console.error("Error al editar usuario:", err);
-        return enviarAlerta(res, "Error al editar usuario", false);
-        }
-        enviarAlerta(res, "Usuario editado exitosamente");
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return enviarAlerta(res, "Acceso denegado", false);
     }
+
+    const { id, username, rol } = req.body;
+    if (!id || !username || !rol) {
+        return enviarAlerta(res, "Faltan datos para editar usuario", false);
+    }
+
+    pool.query(
+        "UPDATE usuarios SET username = $1, rol = $2 WHERE id = $3",
+        [sanitize(username), sanitize(rol), id],
+        (err) => {
+            if (err) {
+                console.error("Error al editar usuario:", err);
+                return enviarAlerta(res, "Error al editar usuario", false);
+            }
+            enviarAlerta(res, "Usuario editado exitosamente");
+        }
     );
 });
 
-// Eliminar Usuarios (solo admins)
+// Eliminar Usuario (solo admins)
 app.post("/eliminarUsuario", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-    return enviarAlerta(res, "Acceso denegado", false);
+        return enviarAlerta(res, "Acceso denegado", false);
     }
 
     const { id } = req.body;
     if (!id) {
-    return enviarAlerta(res, "Falta ID para eliminar usuario", false);
+        return enviarAlerta(res, "Falta ID para eliminar usuario", false);
     }
 
     pool.query(
-    "DELETE FROM usuarios WHERE id = $1",
-    [id],
-    (err) => {
-        if (err) {
-        console.error("Error al eliminar usuario:", err);
-        return enviarAlerta(res, "Error al eliminar usuario", false);
+        "DELETE FROM usuarios WHERE id = $1",
+        [id],
+        (err) => {
+            if (err) {
+                console.error("Error al eliminar usuario:", err);
+                return enviarAlerta(res, "Error al eliminar usuario", false);
+            }
+            enviarAlerta(res, "Usuario eliminado exitosamente");
         }
-        enviarAlerta(res, "Usuario eliminado exitosamente");
-    }
     );
 });
 
