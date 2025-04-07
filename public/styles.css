@@ -177,7 +177,7 @@ button:hover, .btn-glitch:hover {
 .table a.btn {
     padding: 10px 15px;  /* Aseguramos un tamaño consistente en todos los botones */
     font-size: 1rem; /* Tamaño de fuente consistente */
-    margin: 5px; /* Un pequeño margen entre los botones */
+    margin: 0px; /* Un pequeño margen entre los botones */
     display: inline-block;
     border-radius: 0px; /* Bordes redondeados para que se vean más estéticos */
     text-align: center; /* Centrar el texto dentro del botón */
