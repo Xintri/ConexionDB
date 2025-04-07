@@ -277,40 +277,42 @@ app.get("/verAngeles", (req, res) => {
             return res.status(500).send("Error al obtener ángeles");
         }
 
+        // Código HTML actualizado para la tabla de Ángeles
         let tablaAngeles = `
-            <table class="table table-dark table-bordered table-hover text-center">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Código</th>
-                        <th>Jerarquía</th>
-                        <th class="col-lg-4">Captura</th>
-                        <th>Estado</th>
-                        <th>Fecha de Registro</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-        result.rows.forEach(angel => {
-            tablaAngeles += `
+        <table class="table table-dark table-bordered table-hover text-center">
+            <thead>
                 <tr>
-                    <td>${angel.id}</td>
-                    <td>${angel.nombre}</td>
-                    <td>${angel.codigo}</td>
-                    <td>${angel.jerarquia}</td>
-                    <td>${angel.captura}</td>
-                    <td>${angel.estado}</td>
-                    <td>${angel.fecha_registro}</td>
-                    <td>
-                        <a href="/editarAngel/${angel.id}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="/eliminarAngel/${angel.id}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>`;
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Código</th>
+                    <th>Jerarquía</th>
+                    <th>Captura</th>
+                    <th>Estado</th>
+                    <th>Fecha de Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        resultados.rows.forEach(angel => {
+        tablaAngeles += `
+            <tr>
+                <td>${angel.id}</td>
+                <td>${angel.nombre}</td>
+                <td>${angel.codigo}</td>
+                <td>${angel.jerarquia}</td>
+                <td>${angel.captura}</td>
+                <td>${angel.estado}</td>
+                <td>${angel.fecha_registro}</td>
+                <td>
+                    <a href="/editarAngel/${angel.id}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="/eliminarAngel/${angel.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>`;
         });
 
         tablaAngeles += `</tbody></table>`;
+
 
         res.send(`
             <!DOCTYPE html>
@@ -338,13 +340,44 @@ app.get("/verAngeles", (req, res) => {
     });
 });
 
-// Ruta para editar un ángel
-app.post("/editarAngel", (req, res) => {
-    const { id, nombre, codigo, jerarquia, captura, estado } = req.body;
-    if (!id || !nombre || !codigo || !jerarquia || !captura || !estado) {
-        return res.status(400).send("Faltan datos para editar el ángel");
+// Ruta para editar un ángel (solo admins)
+app.get("/editarAngel/:id", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
     }
 
+    const { id } = req.params;
+    pool.query("SELECT * FROM angeles WHERE id = $1", [id], (err, result) => {
+        if (err) {
+            console.error("Error al obtener ángel:", err);
+            return res.status(500).send("Error al obtener ángel");
+        }
+        if (result.rows.length === 0) {
+            return res.status(404).send("Ángel no encontrado");
+        }
+        // Si se encuentra el ángel, mostrar formulario de edición
+        const angel = result.rows[0];
+        res.send(`
+            <form action="/editarAngel" method="POST">
+                <input type="hidden" name="id" value="${angel.id}">
+                <input type="text" name="nombre" value="${angel.nombre}">
+                <input type="text" name="codigo" value="${angel.codigo}">
+                <input type="text" name="jerarquia" value="${angel.jerarquia}">
+                <textarea name="captura">${angel.captura}</textarea>
+                <input type="text" name="estado" value="${angel.estado}">
+                <button type="submit">Actualizar Ángel</button>
+            </form>
+        `);
+    });
+});
+
+// Ruta para actualizar los datos del ángel (solo admins)
+app.post("/editarAngel", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
+    }
+
+    const { id, nombre, codigo, jerarquia, captura, estado } = req.body;
     pool.query(
         "UPDATE angeles SET nombre = $1, codigo = $2, jerarquia = $3, captura = $4, estado = $5 WHERE id = $6",
         [nombre, codigo, jerarquia, captura, estado, id],
@@ -358,10 +391,13 @@ app.post("/editarAngel", (req, res) => {
     );
 });
 
-// Ruta para eliminar un ángel
-app.post("/eliminarAngel", (req, res) => {
-    const { id } = req.body;
+// Ruta para eliminar un ángel (solo admins)
+app.post("/eliminarAngel/:id", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
+    }
 
+    const { id } = req.params;
     pool.query("DELETE FROM angeles WHERE id = $1", [id], (err) => {
         if (err) {
             console.error("Error al eliminar ángel:", err);
@@ -370,6 +406,7 @@ app.post("/eliminarAngel", (req, res) => {
         res.redirect("/verAngeles");
     });
 });
+
 
 // Añadir Experimento
 app.post("/agregarExperimento", (req, res) => {
@@ -474,34 +511,36 @@ app.get("/verExperimentos", (req, res) => {
             return res.status(500).send("Error al obtener experimentos");
         }
 
+        // Código HTML actualizado para la tabla de Experimentos
         let tablaExperimentos = `
-            <table class="table table-dark table-bordered table-hover text-center">
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Tipo</th>
-                        <th>Descripción</th>
-                        <th>Resultado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-        result.rows.forEach(experiment => {
-            tablaExperimentos += `
+        <table class="table table-dark table-bordered table-hover text-center">
+            <thead>
                 <tr>
-                    <td>${experiment.numero_experimento}</td>
-                    <td>${experiment.tipo_experimento}</td>
-                    <td>${experiment.descripcion}</td>
-                    <td>${experiment.resultado}</td>
-                    <td>
-                        <a href="/editarExperimento/${experiment.id}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="/eliminarExperimento/${experiment.id}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>`;
+                    <th>Número</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Resultado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        resultados.rows.forEach(experiment => {
+        tablaExperimentos += `
+            <tr>
+                <td>${experiment.numero_experimento}</td>
+                <td>${experiment.tipo_experimento}</td>
+                <td>${experiment.descripcion}</td>
+                <td>${experiment.resultado}</td>
+                <td>
+                    <a href="/editarExperimento/${experiment.id}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="/eliminarExperimento/${experiment.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>`;
         });
 
         tablaExperimentos += `</tbody></table>`;
+
 
         res.send(`
             <!DOCTYPE html>
@@ -529,13 +568,43 @@ app.get("/verExperimentos", (req, res) => {
     });
 });
 
-// Ruta para editar un experimento
-app.post("/editarExperimento", (req, res) => {
-    const { id, numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
-    if (!id || !numero_experimento || !tipo_experimento || !descripcion || !resultado) {
-        return res.status(400).send("Faltan datos para editar el experimento");
+// Ruta para editar un experimento (solo admins)
+app.get("/editarExperimento/:id", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
     }
 
+    const { id } = req.params;
+    pool.query("SELECT * FROM experimentos WHERE id = $1", [id], (err, result) => {
+        if (err) {
+            console.error("Error al obtener experimento:", err);
+            return res.status(500).send("Error al obtener experimento");
+        }
+        if (result.rows.length === 0) {
+            return res.status(404).send("Experimento no encontrado");
+        }
+        // Si se encuentra el experimento, mostrar formulario de edición
+        const experiment = result.rows[0];
+        res.send(`
+            <form action="/editarExperimento" method="POST">
+                <input type="hidden" name="id" value="${experiment.id}">
+                <input type="text" name="numero_experimento" value="${experiment.numero_experimento}">
+                <input type="text" name="tipo_experimento" value="${experiment.tipo_experimento}">
+                <textarea name="descripcion">${experiment.descripcion}</textarea>
+                <textarea name="resultado">${experiment.resultado}</textarea>
+                <button type="submit">Actualizar Experimento</button>
+            </form>
+        `);
+    });
+});
+
+// Ruta para actualizar los datos del experimento (solo admins)
+app.post("/editarExperimento", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
+    }
+
+    const { id, numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
     pool.query(
         "UPDATE experimentos SET numero_experimento = $1, tipo_experimento = $2, descripcion = $3, resultado = $4 WHERE id = $5",
         [numero_experimento, tipo_experimento, descripcion, resultado, id],
@@ -549,10 +618,13 @@ app.post("/editarExperimento", (req, res) => {
     );
 });
 
-// Ruta para eliminar un experimento
-app.post("/eliminarExperimento", (req, res) => {
-    const { id } = req.body;
+// Ruta para eliminar un experimento (solo admins)
+app.post("/eliminarExperimento/:id", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
+    }
 
+    const { id } = req.params;
     pool.query("DELETE FROM experimentos WHERE id = $1", [id], (err) => {
         if (err) {
             console.error("Error al eliminar experimento:", err);
@@ -561,6 +633,7 @@ app.post("/eliminarExperimento", (req, res) => {
         res.redirect("/verExperimentos");
     });
 });
+
 
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
@@ -577,29 +650,30 @@ app.get("/obtenerUsuarios", (req, res) => {
             return res.status(500).json({ mensaje: "Error al obtener usuarios" });
         }
 
+        // Código HTML actualizado para la tabla de Usuarios
         let tablaUsuarios = `
-            <table class="table table-bordered table-hover text-center">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre de Usuario</th>
-                        <th>Rol</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-        result.rows.forEach(user => {
-            tablaUsuarios += `
+        <table class="table table-dark table-bordered table-hover text-center">
+            <thead>
                 <tr>
-                    <td>${user.id}</td>
-                    <td>${user.username}</td>
-                    <td>${user.rol}</td>
-                    <td>
-                        <a href="/editarUsuario/${user.id}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="/eliminarUsuario/${user.id}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
-                </tr>`;
+                    <th>ID</th>
+                    <th>Nombre de Usuario</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        resultados.rows.forEach(user => {
+        tablaUsuarios += `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.rol}</td>
+                <td>
+                    <a href="/editarUsuario/${user.id}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="/eliminarUsuario/${user.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>`;
         });
 
         tablaUsuarios += `</tbody></table>`;
@@ -691,52 +765,71 @@ app.get("/verUsuarios", (req, res) => {
     });
 });
 
-// Editar Usuario (solo admins)
+// Ruta para editar un usuario (solo admins)
+app.get("/editarUsuario/:id", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
+    }
+
+    const { id } = req.params;
+    pool.query("SELECT * FROM usuarios WHERE id = $1", [id], (err, result) => {
+        if (err) {
+            console.error("Error al obtener usuario:", err);
+            return res.status(500).send("Error al obtener usuario");
+        }
+        if (result.rows.length === 0) {
+            return res.status(404).send("Usuario no encontrado");
+        }
+        // Si se encuentra el usuario, mostrar formulario de edición
+        const user = result.rows[0];
+        res.send(`
+            <form action="/editarUsuario" method="POST">
+                <input type="hidden" name="id" value="${user.id}">
+                <input type="text" name="username" value="${user.username}">
+                <select name="rol">
+                    <option value="admin" ${user.rol === "admin" ? "selected" : ""}>Admin</option>
+                    <option value="user" ${user.rol === "user" ? "selected" : ""}>User</option>
+                </select>
+                <button type="submit">Actualizar Usuario</button>
+            </form>
+        `);
+    });
+});
+
+// Ruta para actualizar los datos del usuario (solo admins)
 app.post("/editarUsuario", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return enviarAlerta(res, "Acceso denegado", false);
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
     }
 
     const { id, username, rol } = req.body;
-    if (!id || !username || !rol) {
-        return enviarAlerta(res, "Faltan datos para editar usuario", false);
-    }
-
     pool.query(
         "UPDATE usuarios SET username = $1, rol = $2 WHERE id = $3",
-        [sanitize(username), sanitize(rol), id],
+        [username, rol, id],
         (err) => {
             if (err) {
                 console.error("Error al editar usuario:", err);
-                return enviarAlerta(res, "Error al editar usuario", false);
+                return res.status(500).send("Error al editar usuario");
             }
-            enviarAlerta(res, "Usuario editado exitosamente");
+            res.redirect("/verUsuarios");
         }
     );
 });
 
-// Eliminar Usuario (solo admins)
-app.post("/eliminarUsuario", (req, res) => {
+// Ruta para eliminar un usuario (solo admins)
+app.post("/eliminarUsuario/:id", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return enviarAlerta(res, "Acceso denegado", false);
+        return res.redirect("/login.html"); // Redirigir si no es admin o no está autenticado
     }
 
-    const { id } = req.body;
-    if (!id) {
-        return enviarAlerta(res, "Falta ID para eliminar usuario", false);
-    }
-
-    pool.query(
-        "DELETE FROM usuarios WHERE id = $1",
-        [id],
-        (err) => {
-            if (err) {
-                console.error("Error al eliminar usuario:", err);
-                return enviarAlerta(res, "Error al eliminar usuario", false);
-            }
-            enviarAlerta(res, "Usuario eliminado exitosamente");
+    const { id } = req.params;
+    pool.query("DELETE FROM usuarios WHERE id = $1", [id], (err) => {
+        if (err) {
+            console.error("Error al eliminar usuario:", err);
+            return res.status(500).send("Error al eliminar usuario");
         }
-    );
+        res.redirect("/verUsuarios");
+    });
 });
 
 // Iniciar servidor
