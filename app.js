@@ -227,6 +227,7 @@ app.get("/obtenerAngeles", (req, res) => {
     });
 });
 
+// Ruta para ver la lista de ángeles
 app.get("/verAngeles", (req, res) => {
     if (!req.session.user) {
         return res.redirect("/login.html");  // Redirigir al login si no está autenticado
@@ -237,10 +238,9 @@ app.get("/verAngeles", (req, res) => {
             console.error("Error al obtener ángeles:", err);
             return res.status(500).send("Error al obtener ángeles");
         }
-        res.sendFile(path.join(__dirname, "public", "verAngeles.html"));  // Mostrar la página con los ángeles
+        res.render("verAngeles", { angeles: result.rows });  // Mostrar ángeles en una tabla
     });
 });
-
 
 // Ruta para editar un ángel
 app.post("/editarAngel", (req, res) => {
@@ -387,7 +387,7 @@ app.post("/eliminarExperimento", (req, res) => {
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
 
-// Ruta para ver la lista de usuarios (solo admin)
+// Ver Usuarios (solo admins)
 app.get("/obtenerUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
         return enviarAlerta(res, "Acceso denegado", false); // Acceso denegado si no es admin
