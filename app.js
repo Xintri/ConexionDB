@@ -388,17 +388,16 @@ app.post("/eliminarExperimento", (req, res) => {
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
 
 // Ruta para ver la lista de usuarios (solo admin)
-app.get("/verUsuarios", (req, res) => {
+app.get("/obtenerUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");  // Redirigir al login si no es admin
+        return enviarAlerta(res, "Acceso denegado", false);
     }
-
     pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
         if (err) {
             console.error("Error al obtener usuarios:", err);
-            return res.status(500).send("Error al obtener usuarios");
+            return enviarAlerta(res, "Error al obtener usuarios", false);
         }
-        res.sendFile(path.join(__dirname, "public", "verUsuarios.html"));
+        res.json(result.rows);
     });
 });
 
