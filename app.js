@@ -212,12 +212,33 @@ app.post("/editarAngel", (req, res) => {
     );
 });
 
-// Ruta para ver la lista de Angeles
-app.get("/verAngeles", (req, res) => {
-    if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
+// Obtener y mostrar los ángeles
+app.get("/obtenerAngeles", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ mensaje: "No autorizado" });  // Verifica si el usuario está autenticado
     }
-    res.sendFile(path.join(__dirname, "public", "verAngeles.html"));  // Asegúrate de que la ruta sea correcta
+
+    pool.query("SELECT * FROM angeles", (err, result) => {
+        if (err) {
+            console.error("Error al obtener ángeles:", err);
+            return res.status(500).json({ mensaje: "Error al obtener ángeles" });
+        }
+        res.json(result.rows);  // Devuelve los datos de los ángeles
+    });
+});
+
+app.get("/verAngeles", (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login.html");  // Redirigir al login si no está autenticado
+    }
+
+    pool.query("SELECT * FROM angeles", (err, result) => {
+        if (err) {
+            console.error("Error al obtener ángeles:", err);
+            return res.status(500).send("Error al obtener ángeles");
+        }
+        res.sendFile(path.join(__dirname, "public", "verAngeles.html"));  // Mostrar la página con los ángeles
+    });
 });
 
 
@@ -315,12 +336,19 @@ app.get("/obtenerExperimentos", (req, res) => {
     });
 });
 
-// Ruta para ver la lista de Experimentos
+// Ruta para ver la lista de experimentos
 app.get("/verExperimentos", (req, res) => {
-    if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
+    if (!req.session.user) {
+        return res.redirect("/login.html");  // Redirigir al login si no está autenticado
     }
-    res.sendFile(path.join(__dirname, "public", "verExperimentos.html"));  // Asegúrate de que la ruta sea correcta
+
+    pool.query("SELECT * FROM experimentos", (err, result) => {
+        if (err) {
+            console.error("Error al obtener experimentos:", err);
+            return res.status(500).send("Error al obtener experimentos");
+        }
+        res.sendFile(path.join(__dirname, "public", "verExperimentos.html"));  // Mostrar la página con los experimentos
+    });
 });
 
 // Ruta para editar un experimento
@@ -360,13 +388,19 @@ app.post("/eliminarExperimento", (req, res) => {
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
 
 // Ruta para ver la lista de usuarios (solo admin)
-app.get("/verUsuarios", (req, res) => {
+app.get("/obtenerUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
+        return enviarAlerta(res, "Acceso denegado", false); // Acceso denegado si no es admin
     }
-    res.sendFile(path.join(__dirname, "public", "verUsuarios.html"));  // Asegúrate de que la ruta sea correcta
-});
 
+    pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
+        if (err) {
+            console.error("Error al obtener usuarios:", err);
+            return enviarAlerta(res, "Error al obtener usuarios", false);
+        }
+        res.json(result.rows);  // Devolver los datos de los usuarios
+    });
+});
 
 // Editar Usuario (solo admins)
 app.post("/editarUsuario", (req, res) => {
