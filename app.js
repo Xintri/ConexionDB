@@ -230,7 +230,9 @@ app.get("/verAngeles", (req, res) => {
                 <td>${angel.fecha_registro}</td>
                 <td>
                     <a href="/editarAngel/${angel.id}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="/eliminarAngel/${angel.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <form action="/eliminarAngel/${angel.id}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
                 </td>
             </tr>`;
         });
