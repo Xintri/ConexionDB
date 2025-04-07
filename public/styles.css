@@ -114,7 +114,6 @@ button, .btn-glitch {
 /* Ajustes de color en los botones */
 button:hover, .btn-glitch:hover {
     background: linear-gradient(90deg, #990000, #ff0000);
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
     transform: scale(1.05); /* Un pequeño efecto de expansión al pasar el ratón */
 }
 
@@ -180,7 +179,6 @@ button:hover, .btn-glitch:hover {
     font-size: 1rem; /* Tamaño de fuente consistente */
     margin: 5px; /* Un pequeño margen entre los botones */
     display: inline-block;
-    border-radius: 8px; /* Bordes redondeados para que se vean más estéticos */
     text-align: center; /* Centrar el texto dentro del botón */
 }
 
