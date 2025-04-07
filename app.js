@@ -46,11 +46,11 @@ function enviarAlerta(res, mensaje, exito = true) {
 // Mostrar la página de login o index
 app.get("/", (req, res) => {
     if (req.session.user) {
-        // Si el usuario está autenticado, mostrar el index
+        console.log("Sesión activa para el usuario:", req.session.user.username);
         res.sendFile(path.join(__dirname, "public", "index.html"));
     } else {
-        // Si el usuario no está autenticado, redirigir al login
-        res.sendFile(path.join(__dirname, "public", "login.html"));
+        console.log("No se encontró sesión activa. Redirigiendo a login.");
+        res.redirect("/login.html");
     }
 });
 
@@ -122,35 +122,35 @@ app.post("/login", (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return enviarAlerta(res, "Faltan datos en login", false);
+        return res.redirect("/login.html");  // Si falta información, redirigir al login
     }
 
     pool.query(
         "SELECT * FROM usuarios WHERE username = $1",
         [username],
         (err, result) => {
-        if (err) {
-            console.error("Error al iniciar sesión:", err);
-            return enviarAlerta(res, "Error en el servidor", false);
-        }
+            if (err) {
+                console.error("Error al iniciar sesión:", err);
+                return res.redirect("/login.html");  // Redirigir al login si hay un error
+            }
 
-        if (result.rows.length === 0) {
-            return enviarAlerta(res, "Usuario no encontrado", false);
-        }
+            if (result.rows.length === 0) {
+                return res.redirect("/login.html");  // Redirigir si el usuario no existe
+            }
 
-        const usuario = result.rows[0];
+            const usuario = result.rows[0];
 
-        if (usuario.password !== password) {
-            return enviarAlerta(res, "Contraseña incorrecta", false);
-        }
+            if (usuario.password !== password) {
+                return res.redirect("/login.html");  // Redirigir si la contraseña es incorrecta
+            }
 
-        req.session.user = {
-            id: usuario.id,
-            username: usuario.username,
-            rol: usuario.rol
-        };
+            req.session.user = {
+                id: usuario.id,
+                username: usuario.username,
+                rol: usuario.rol
+            };
 
-        enviarAlerta(res, "Inicio de sesión exitoso");
+            res.redirect("/");  // Redirigir al inicio si la sesión fue exitosa
         }
     );
 });
@@ -213,6 +213,79 @@ app.get("/obtenerAngeles", (req, res) => {
                         <th>Código</th>
                         <th>Jerarquía</th>
                         <th>Captura</th>
+                        <th>Estado</th>
+                        <th>Fecha de Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        result.rows.forEach(angel => {
+            tablaAngeles += `
+                <tr>
+                    <td>${angel.id}</td>
+                    <td>${angel.nombre}</td>
+                    <td>${angel.codigo}</td>
+                    <td>${angel.jerarquia}</td>
+                    <td>${angel.captura}</td>
+                    <td>${angel.estado}</td>
+                    <td>${angel.fecha_registro}</td>
+                    <td>
+                        <a href="/editarAngel/${angel.id}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="/eliminarAngel/${angel.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>`;
+        });
+
+        tablaAngeles += `</tbody></table>`;
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Ángeles Registrados</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="min-vh-100">
+                <div class="container text-center">
+                    <h2 class="glitch">Lista de Ángeles Registrados</h2>
+                    ${tablaAngeles}
+                    <div class="mt-4">
+                        <a href="/">
+                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
+                        </a>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+    });
+});
+
+// Ruta para ver la lista de ángeles
+app.get("/verAngeles", (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login.html"); // Redirigir al login si no está autenticado
+    }
+
+    pool.query("SELECT * FROM angeles", (err, result) => {
+        if (err) {
+            console.error("Error al obtener ángeles:", err);
+            return res.status(500).send("Error al obtener ángeles");
+        }
+
+        let tablaAngeles = `
+            <table class="table table-dark table-bordered table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Código</th>
+                        <th>Jerarquía</th>
+                        <th class="col-lg-4">Captura</th>
                         <th>Estado</th>
                         <th>Fecha de Registro</th>
                         <th>Acciones</th>
@@ -389,6 +462,73 @@ app.get("/obtenerExperimentos", (req, res) => {
     });
 });
 
+// Ruta para ver la lista de experimentos
+app.get("/verExperimentos", (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login.html"); // Redirigir al login si no está autenticado
+    }
+
+    pool.query("SELECT * FROM experimentos", (err, result) => {
+        if (err) {
+            console.error("Error al obtener experimentos:", err);
+            return res.status(500).send("Error al obtener experimentos");
+        }
+
+        let tablaExperimentos = `
+            <table class="table table-dark table-bordered table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Resultado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        result.rows.forEach(experiment => {
+            tablaExperimentos += `
+                <tr>
+                    <td>${experiment.numero_experimento}</td>
+                    <td>${experiment.tipo_experimento}</td>
+                    <td>${experiment.descripcion}</td>
+                    <td>${experiment.resultado}</td>
+                    <td>
+                        <a href="/editarExperimento/${experiment.id}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="/eliminarExperimento/${experiment.id}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>`;
+        });
+
+        tablaExperimentos += `</tbody></table>`;
+
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Experimentos Registrados</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body class="min-vh-100">
+                <div class="container text-center">
+                    <h2 class="glitch">Lista de Experimentos Registrados</h2>
+                    ${tablaExperimentos}
+                    <div class="mt-4">
+                        <a href="/">
+                            <button class="btn btn-glitch w-100">Volver a Inicio</button>
+                        </a>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+    });
+});
+
 // Ruta para editar un experimento
 app.post("/editarExperimento", (req, res) => {
     const { id, numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
@@ -484,6 +624,67 @@ app.get("/obtenerUsuarios", (req, res) => {
                         </a>
                     </div>
                 </div>
+            </body>
+            </html>
+        `);
+    });
+});
+
+// Ruta para ver la lista de usuarios (solo admins)
+app.get("/verUsuarios", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html");  // Redirigir al login si no está autenticado o no es admin
+    }
+
+    // Obtener los usuarios
+    pool.query("SELECT id, username, rol FROM usuarios", (err, result) => {
+        if (err) {
+            console.error("Error al obtener usuarios:", err);
+            return res.status(500).send("Error al obtener usuarios");
+        }
+
+        // Pasar los datos de los usuarios y el rol al HTML
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Usuarios Registrados</title>
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body>
+                <h1>Usuarios Registrados</h1>
+                ${req.session.user.rol === "admin" ? `
+                    <a href="/verUsuarios">
+                        <button class="btn btn-primary">Ver Usuarios</button>
+                    </a>
+                ` : ''}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre de Usuario</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${result.rows.map(user => `
+                            <tr>
+                                <td>${user.id}</td>
+                                <td>${user.username}</td>
+                                <td>${user.rol}</td>
+                                <td>
+                                    <button class="btn btn-warning">Editar</button>
+                                    <button class="btn btn-danger">Eliminar</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <hr>
+                <a href="/logout"><button class="btn btn-danger">Cerrar sesión</button></a>
             </body>
             </html>
         `);
