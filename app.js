@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const path = require('path');
 const { Pool } = require("pg");
-const session = require('express-session');
 require("dotenv").config();
+const session = require('express-session');
 
 const app = express();
 
