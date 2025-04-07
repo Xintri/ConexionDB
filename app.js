@@ -230,7 +230,7 @@ app.get("/obtenerUsuarios", (req, res) => {
 // Ruta para ver la lista de ángeles
 app.get("/verAngeles", (req, res) => {
     if (!req.session.user) {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado
+        return res.redirect("/login.html"); // Redirigir al login si no está autenticado
     }
 
     pool.query("SELECT * FROM angeles", (err, result) => {
@@ -238,8 +238,7 @@ app.get("/verAngeles", (req, res) => {
             console.error("Error al obtener ángeles:", err);
             return res.status(500).send("Error al obtener ángeles");
         }
-        // Renderizar la página con los datos de los ángeles
-        res.render("verAngeles", { angeles: result.rows });  
+        res.sendFile(path.join(__dirname, "public", "verAngeles.html"));  // Asegúrate que la ruta sea correcta
     });
 });
 
@@ -338,7 +337,7 @@ app.get("/obtenerExperimentos", (req, res) => {
 // Ruta para ver la lista de experimentos
 app.get("/verExperimentos", (req, res) => {
     if (!req.session.user) {
-        return res.redirect("/login.html");  // Redirigir al login si no está autenticado
+        return res.redirect("/login.html"); // Redirigir al login si no está autenticado
     }
 
     pool.query("SELECT * FROM experimentos", (err, result) => {
@@ -346,7 +345,7 @@ app.get("/verExperimentos", (req, res) => {
             console.error("Error al obtener experimentos:", err);
             return res.status(500).send("Error al obtener experimentos");
         }
-        res.sendFile(path.join(__dirname, "public", "verExperimentos.html"));  // Mostrar la página con los experimentos
+        res.sendFile(path.join(__dirname, "public", "verExperimentos.html")); // Asegúrate que la ruta sea correcta
     });
 });
 
@@ -386,7 +385,7 @@ app.post("/eliminarExperimento", (req, res) => {
 
 // 🔥 RUTAS SOLO PARA ADMIN 🔥
 
-// Ver Usuarios (solo admins)
+// Obtener Usuarios (solo admins)
 app.get("/obtenerUsuarios", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
         return enviarAlerta(res, "Acceso denegado", false); // Acceso denegado si no es admin
@@ -399,6 +398,14 @@ app.get("/obtenerUsuarios", (req, res) => {
         }
         res.json(result.rows);  // Devolver los datos de los usuarios
     });
+});
+
+// Ver la lista de usuarios (solo admins)
+app.get("/verUsuarios", (req, res) => {
+    if (!req.session.user || req.session.user.rol !== "admin") {
+        return res.redirect("/login.html"); // Redirigir al login si no está autenticado o no es admin
+    }
+    res.sendFile(path.join(__dirname, "public", "verUsuarios.html")); // Asegúrate que la ruta sea correcta
 });
 
 // Editar Usuario (solo admins)
