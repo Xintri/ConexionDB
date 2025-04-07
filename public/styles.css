@@ -101,15 +101,17 @@ textarea {
 button, .btn-glitch {
     background: linear-gradient(90deg, #ff0000, #990000);
     border: none;
-    padding: 12px; /* Aumentado el tamaño del botón */
+    padding: 12px;
     color: white;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.2rem;
     text-transform: uppercase;
     border-radius: 8px;
-    width: 100%;
+    width: 100%;  /* Aseguramos que ocupen el 100% del ancho disponible */
     transition: all 0.3s ease;
-}
+    display: inline-block;
+    visibility: visible;
+    box-sizing: border-box;
 
 button:hover, .btn-glitch:hover {
     background: linear-gradient(90deg, #990000, #ff0000);
@@ -166,6 +168,13 @@ button:hover, .btn-glitch:hover {
     background-color: rgba(255, 0, 0, 0.2);
 }
 
+/* Hover en los botones */
+button:hover, .btn-glitch:hover {
+    background: linear-gradient(90deg, #990000, #ff0000);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño del botón al pasar el cursor */
+}
+
 /* Botones dentro de tabla */
 .table a.btn {
     padding: 6px 10px;
@@ -174,11 +183,25 @@ button:hover, .btn-glitch:hover {
     display: inline-block;
 }
 
-/* Estilo para botones específicos */
+/* 🔥 Botones específicos */
 .btn-warning {
     background-color: #f39c12;
     border: none;
     color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
 }
 
 .btn-warning:hover {
@@ -210,4 +233,6 @@ button:hover, .btn-glitch:hover {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
 }
