@@ -62,19 +62,6 @@ app.get("/session", (req, res) => {
     }
 });
 
-// Obtener datos de sesión
-app.get("/session", (req, res) => {
-    if (req.session.user) {
-        res.json({
-            loggedIn: true,
-            username: req.session.user.username,
-            rol: req.session.user.rol
-        });
-    } else {
-        res.json({ loggedIn: false });
-    }
-});
-
 // Registro
 app.post("/register", (req, res) => {
     const { username, password, admin_key } = req.body;
