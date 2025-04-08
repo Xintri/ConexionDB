@@ -68,12 +68,12 @@ app.post("/register", (req, res) => {
 
     // Verificar que los campos esenciales están presentes
     if (!username || !password) {
-        return alert('Faltan datos en el registro');
+        alert('Faltan datos en el registro');
     }
 
     // Validar que los datos no contienen palabras o caracteres peligrosos
     if (!validarInput(username) || !validarInput(password)) {
-        return alert("Datos inválidos");
+        alert("Datos inválidos");
     }
 
     // Asignar rol dependiendo de la clave admin_key
@@ -86,7 +86,7 @@ app.post("/register", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al registrar:", err);
-                return alert("Error al registrar usuario");
+                alert("Error al registrar usuario");
             }
 
             // Asignar la sesión para el usuario registrado
@@ -152,11 +152,11 @@ app.get("/logout", (req, res) => {
 
 // Añadir Ángel
 app.post("/agregarAngel", (req, res) => {
-    if (!req.session.user) return alert("No autorizado");
+    if (!req.session.user) alert("No autorizado");
 
     const { nombre, codigo, jerarquia, captura, estado } = req.body;
     if (!nombre || !codigo || !jerarquia || !captura || !estado) {
-        return alert("Faltan datos para registrar ángel");
+        alert("Faltan datos para registrar ángel");
     }
 
     pool.query(
@@ -165,7 +165,7 @@ app.post("/agregarAngel", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al agregar ángel:", err);
-                return alert("Error al registrar ángel");
+                alert("Error al registrar ángel");
             }
             alert("Ángel registrado exitosamente");
         }
@@ -355,11 +355,11 @@ app.post("/eliminarAngel/:id", (req, res) => {
 
 // Añadir Experimento
 app.post("/agregarExperimento", (req, res) => {
-    if (!req.session.user) return alert("No autorizado");
+    if (!req.session.user) alert("No autorizado");
 
     const { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
     if (!numero_experimento || !tipo_experimento || !descripcion || !resultado) {
-        return alert("Faltan datos para registrar experimento");
+        alert("Faltan datos para registrar experimento");
     }
 
     pool.query(
@@ -368,7 +368,7 @@ app.post("/agregarExperimento", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al agregar experimento:", err);
-                return alert("Error al registrar experimento");
+                alert("Error al registrar experimento");
             }
             alert("Experimento registrado exitosamente");
         }
@@ -548,12 +548,12 @@ app.post("/eliminarExperimento/:id", (req, res) => {
 // Añadir Usuario
 app.post("/agregarUsuario", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        return alert("No autorizado");
+        alert("No autorizado");
     }
 
     const { username, password, rol } = req.body;
     if (!username || !password || !rol) {
-        return alert("Faltan datos para registrar usuario");
+        alert("Faltan datos para registrar usuario");
     }
 
     pool.query(
@@ -562,7 +562,7 @@ app.post("/agregarUsuario", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al agregar usuario:", err);
-                return alert("Error al registrar usuario");
+                alert("Error al registrar usuario");
             }
             alert("Usuario registrado exitosamente");
         }

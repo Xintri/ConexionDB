@@ -85,4 +85,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         })
         .catch(error => console.error('Error al obtener usuarios:', error));
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Verificar si hay un mensaje en la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const mensaje = urlParams.get('mensaje');
+            if (mensaje) {
+                alert(mensaje);  // Mostrar el mensaje como alerta
+            }
+        
 });
