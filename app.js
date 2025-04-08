@@ -111,7 +111,7 @@ app.post("/register", (req, res) => {
             req.session.user = { username, rol };  // Asignar la sesión con el rol correspondiente
 
             // Enviar alerta de registro exitoso
-            enviarAlerta(res, "Registro exitoso");
+            return enviarAlerta(res, "Registro exitoso", true);
         }
     );
 });
@@ -149,7 +149,8 @@ app.post("/login", (req, res) => {
                 rol: usuario.rol
             };
 
-            res.redirect("/");  // Redirigir al inicio si la sesión fue exitosa
+            res.redirect("/");
+            return enviarAlerta(res, "Inicio exitoso", true);  // Redirigir al inicio si la sesión fue exitosa
         }
     );
 });
@@ -160,7 +161,8 @@ app.get("/logout", (req, res) => {
         if (err) {
             return res.redirect("/");  // En caso de error al destruir la sesión, redirigir al home
         }
-        res.redirect("/login.html");  // Redirigir al login después de cerrar sesión
+        res.redirect("/login.html");
+        return enviarAlerta(res, "Cerraste sesión", true);  // Redirigir al login después de cerrar sesión
     });
 });
 
