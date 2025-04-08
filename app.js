@@ -33,14 +33,31 @@ function validarInput(input) {
     const lowerInput = input.toLowerCase();
     return !forbidden.some(word => lowerInput.includes(word)) && !/[<>]/.test(input);
 }
+//envia alerts
+function enviarAlerta(res, mensaje, esExito = true) {
+    const tipo = esExito ? 'success' : 'error'; // Tipo de alerta
+    const redirectUrl = tipo === 'success' ? '/' : '/login.html'; // URL a la que redirigir
+
+    // Enviar la página HTML completa con el script de alerta y redirección
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Alerta</title>
+            </head>
+            <body>
+                <script type="text/javascript">
+                    alert("${mensaje}");
+                    window.location.href = "${redirectUrl}";
+                </script>
+            </body>
+        </html>
+    `);
+}
+
 
 function sanitize(value) {
     return value.replace(/[<>]/g, '');
-}
-
-// Función para enviar respuesta con redirección y alerta
-function enviarAlerta(res, mensaje, exito = true) {
-    res.redirect(`/?mensaje=${encodeURIComponent(mensaje)}&exito=${exito}`);
 }
 
 // Mostrar la página de login o index
