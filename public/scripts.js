@@ -98,4 +98,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(`Error: ${mensaje}`);
             }
         }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mensaje = urlParams.get('mensaje');
+            const exito = urlParams.get('exito');
+    
+            if (mensaje) {
+                alert(mensaje);  // Mostrar el mensaje
+                if (exito === 'true') {
+                    // Puedes realizar algo si la acción fue exitosa
+                    console.log("Acción exitosa!");
+                } else {
+                    // Manejo para errores
+                    console.log("Hubo un error");
+                }
+            }
+        };
+    
 });

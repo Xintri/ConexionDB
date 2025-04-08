@@ -121,7 +121,7 @@ app.post("/login", (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return res.redirect("/login.html");  // Si falta información, redirigir al login
+        return res.redirect("/login.html?mensaje=" + encodeURIComponent("Faltan datos para el login") + "&exito=false");
     }
 
     pool.query(
@@ -130,17 +130,17 @@ app.post("/login", (req, res) => {
         (err, result) => {
             if (err) {
                 console.error("Error al iniciar sesión:", err);
-                return res.redirect("/login.html");  // Redirigir al login si hay un error
+                return res.redirect("/login.html?mensaje=" + encodeURIComponent("Error al iniciar sesión") + "&exito=false");
             }
 
             if (result.rows.length === 0) {
-                return res.redirect("/login.html");  // Redirigir si el usuario no existe
+                return res.redirect("/login.html?mensaje=" + encodeURIComponent("Usuario no encontrado") + "&exito=false");
             }
 
             const usuario = result.rows[0];
 
             if (usuario.password !== password) {
-                return res.redirect("/login.html");  // Redirigir si la contraseña es incorrecta
+                return res.redirect("/login.html?mensaje=" + encodeURIComponent("Contraseña incorrecta") + "&exito=false");
             }
 
             req.session.user = {
@@ -149,8 +149,7 @@ app.post("/login", (req, res) => {
                 rol: usuario.rol
             };
 
-            res.redirect("/");
-            return enviarAlerta(res, "Inicio exitoso", true);  // Redirigir al inicio si la sesión fue exitosa
+            res.redirect("/?mensaje=" + encodeURIComponent("Inicio exitoso") + "&exito=true");  // Aquí mostramos la alerta después del login
         }
     );
 });
@@ -159,10 +158,9 @@ app.post("/login", (req, res) => {
 app.get("/logout", (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            return res.redirect("/");  // En caso de error al destruir la sesión, redirigir al home
+            return res.redirect("/?mensaje=" + encodeURIComponent("Error al cerrar sesión") + "&exito=false");
         }
-        res.redirect("/login.html");
-        return enviarAlerta(res, "Cerraste sesión", true);  // Redirigir al login después de cerrar sesión
+        res.redirect("/login.html?mensaje=" + encodeURIComponent("Sesión cerrada exitosamente") + "&exito=true");
     });
 });
 
