@@ -38,6 +38,11 @@ function sanitize(value) {
     return value.replace(/[<>]/g, '');
 }
 
+// Función para enviar respuesta con redirección y alerta
+function enviarAlerta(res, mensaje, exito = true) {
+    res.redirect(`/?mensaje=${encodeURIComponent(mensaje)}&exito=${exito}`);
+}
+
 // Mostrar la página de login o index
 app.get("/", (req, res) => {
     if (req.session.user) {
@@ -62,18 +67,31 @@ app.get("/session", (req, res) => {
     }
 });
 
+// Obtener datos de sesión
+app.get("/session", (req, res) => {
+    if (req.session.user) {
+        res.json({
+            loggedIn: true,
+            username: req.session.user.username,
+            rol: req.session.user.rol
+        });
+    } else {
+        res.json({ loggedIn: false });
+    }
+});
+
 // Registro
 app.post("/register", (req, res) => {
     const { username, password, admin_key } = req.body;
 
     // Verificar que los campos esenciales están presentes
     if (!username || !password) {
-        alert('Faltan datos en el registro');
+        return enviarAlerta(res, "Faltan datos en el registro", false);
     }
 
     // Validar que los datos no contienen palabras o caracteres peligrosos
     if (!validarInput(username) || !validarInput(password)) {
-        alert("Datos inválidos");
+        return enviarAlerta(res, "Datos inválidos", false);
     }
 
     // Asignar rol dependiendo de la clave admin_key
@@ -86,14 +104,14 @@ app.post("/register", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al registrar:", err);
-                alert("Error al registrar usuario");
+                return enviarAlerta(res, "Error al registrar usuario", false);
             }
 
             // Asignar la sesión para el usuario registrado
             req.session.user = { username, rol };  // Asignar la sesión con el rol correspondiente
 
             // Enviar alerta de registro exitoso
-            alert("Registro exitoso");
+            enviarAlerta(res, "Registro exitoso");
         }
     );
 });
@@ -152,11 +170,11 @@ app.get("/logout", (req, res) => {
 
 // Añadir Ángel
 app.post("/agregarAngel", (req, res) => {
-    if (!req.session.user) alert("No autorizado");
+    if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
 
     const { nombre, codigo, jerarquia, captura, estado } = req.body;
     if (!nombre || !codigo || !jerarquia || !captura || !estado) {
-        alert("Faltan datos para registrar ángel");
+        return enviarAlerta(res, "Faltan datos para registrar ángel", false);
     }
 
     pool.query(
@@ -165,9 +183,9 @@ app.post("/agregarAngel", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al agregar ángel:", err);
-                alert("Error al registrar ángel");
+                return enviarAlerta(res, "Error al registrar ángel", false);
             }
-            alert("Ángel registrado exitosamente");
+            enviarAlerta(res, "Ángel registrado exitosamente");
         }
     );
 });
@@ -355,11 +373,11 @@ app.post("/eliminarAngel/:id", (req, res) => {
 
 // Añadir Experimento
 app.post("/agregarExperimento", (req, res) => {
-    if (!req.session.user) alert("No autorizado");
+    if (!req.session.user) return enviarAlerta(res, "No autorizado", false);
 
     const { numero_experimento, tipo_experimento, descripcion, resultado } = req.body;
     if (!numero_experimento || !tipo_experimento || !descripcion || !resultado) {
-        alert("Faltan datos para registrar experimento");
+        return enviarAlerta(res, "Faltan datos para registrar experimento", false);
     }
 
     pool.query(
@@ -368,9 +386,9 @@ app.post("/agregarExperimento", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al agregar experimento:", err);
-                alert("Error al registrar experimento");
+                return enviarAlerta(res, "Error al registrar experimento", false);
             }
-            alert("Experimento registrado exitosamente");
+            enviarAlerta(res, "Experimento registrado exitosamente");
         }
     );
 });
@@ -548,12 +566,12 @@ app.post("/eliminarExperimento/:id", (req, res) => {
 // Añadir Usuario
 app.post("/agregarUsuario", (req, res) => {
     if (!req.session.user || req.session.user.rol !== "admin") {
-        alert("No autorizado");
+        return enviarAlerta(res, "No autorizado", false);
     }
 
     const { username, password, rol } = req.body;
     if (!username || !password || !rol) {
-        alert("Faltan datos para registrar usuario");
+        return enviarAlerta(res, "Faltan datos para registrar usuario", false);
     }
 
     pool.query(
@@ -562,9 +580,9 @@ app.post("/agregarUsuario", (req, res) => {
         (err) => {
             if (err) {
                 console.error("Error al agregar usuario:", err);
-                alert("Error al registrar usuario");
+                return enviarAlerta(res, "Error al registrar usuario", false);
             }
-            alert("Usuario registrado exitosamente");
+            enviarAlerta(res, "Usuario registrado exitosamente");
         }
     );
 });
